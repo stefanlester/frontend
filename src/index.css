@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+	font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+	background: #f6f5fb;
+	color: #2b2340;
+}
+
+h1, h2, h3, .font-heading {
+	font-family: 'Inter', 'Montserrat', Arial, sans-serif;
+	font-weight: 700;
+	letter-spacing: -0.01em;
+}
+
+/* UI helpers */
+.container-wide { max-width: 1200px; margin-left: auto; margin-right: auto; }
+
+.btn-primary {
+	@apply bg-purple-500 text-white font-semibold px-5 py-2 rounded-lg shadow-lg hover:bg-purple-600 transition;
+}
+
+.card-glass {
+	background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.4));
+	backdrop-filter: blur(8px);
+	border: 1px solid rgba(255,255,255,0.6);
+}
+
+.soft-shadow { box-shadow: 0 10px 30px rgba(37,23,77,0.08); }
+
+@media (max-width: 640px) {
+	.min-h-[420px] { min-height: 320px; }
+	.card-mobile-padding { padding-left: 1rem; padding-right: 1rem; }
+	.img-fill-mobile { object-fit: contain; background: #fff; }
+}
