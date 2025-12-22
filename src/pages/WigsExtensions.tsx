@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const WigsExtensions: React.FC = () => (
   <div className="min-h-screen bg-white p-8">
@@ -29,9 +30,9 @@ const WigsExtensions: React.FC = () => (
       </div>
       
       <div className="text-center mt-12">
-        <a href="/products" className="inline-block bg-gradient-to-r from-pink-500 to-rose-600 text-white px-10 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all">
+        <Link to="/products" className="inline-block bg-gradient-to-r from-pink-500 to-rose-600 text-white px-10 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all">
           Shop All Wigs & Extensions →
-        </a>
+        </Link>
       </div>
     </div>
   </div>

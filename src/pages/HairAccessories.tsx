@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const HairAccessories: React.FC = () => (
   <div className="min-h-screen bg-white p-8">
@@ -29,9 +30,9 @@ const HairAccessories: React.FC = () => (
       </div>
       
       <div className="text-center mt-12">
-        <a href="/products" className="inline-block bg-gradient-to-r from-yellow-500 to-orange-600 text-white px-10 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all">
+        <Link to="/products" className="inline-block bg-gradient-to-r from-yellow-500 to-orange-600 text-white px-10 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all">
           Shop All Hair Accessories →
-        </a>
+        </Link>
       </div>
     </div>
   </div>

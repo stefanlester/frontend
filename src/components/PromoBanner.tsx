@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const PromoBanner = () => (
   <section className="relative overflow-hidden bg-blue-600 py-20 px-4">
@@ -22,12 +23,12 @@ const PromoBanner = () => (
             Use code <span className="font-bold text-yellow-300">WELCOME30</span> at checkout
           </p>
           <div className="flex gap-4">
-            <a
-              href="/products"
+            <Link
+              to="/cart"
               className="bg-white text-pink-600 px-8 py-4 rounded-full font-bold shadow-2xl hover:bg-yellow-300 hover:text-gray-900 transition-all transform hover:scale-110"
             >
               Shop Now
-            </a>
+            </Link>
             <button className="border-2 border-white text-white px-8 py-4 rounded-full font-bold hover:bg-white hover:text-pink-600 transition-all">
               Learn More
             </button>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const HairPackages: React.FC = () => {
   // Use real product images for the packages
@@ -44,7 +45,13 @@ const HairPackages: React.FC = () => {
                 </h3>
                 <p className="text-lg text-white/80 mb-4 text-center font-medium" style={{textShadow:'0 2px 8px rgba(0,0,0,0.25)'}}>{pkg.description}</p>
                 <span className="text-xl font-bold text-brand-accent mb-2 drop-shadow">{pkg.price}</span>
-                <button className="mt-2 bg-brand-accent text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary hover:text-brand-accent transition">Shop Now</button>
+                <Link
+                  to="/cart"
+                  state={{ package: pkg }}
+                  className="mt-2 bg-brand-accent text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary hover:text-brand-accent transition text-center"
+                >
+                  Shop Now
+                </Link>
               </div>
             </div>
           ))}

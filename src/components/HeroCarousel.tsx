@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 const slides = [
   {
@@ -61,9 +62,9 @@ const HeroCarousel = () => {
                 <p className="text-3xl text-white/80 mb-8 drop-shadow-lg animate-fadeIn">
                   {slide.subtitle}
                 </p>
-                <a href="/products" className="btn-primary inline-block text-lg">
+                <Link to="/products" className="btn-primary inline-block text-lg">
                   {slide.cta} →
-                </a>
+                </Link>
               </div>
             </div>
           </div>

@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import hairLogo from '../hairlogo.png';
 
 const Footer = () => (
@@ -18,13 +19,13 @@ const Footer = () => (
       <div className="flex flex-col md:flex-row gap-6 mb-6 md:mb-0">
         <div className="text-center md:text-left">
           <h5 className="font-bold mb-2">Shop</h5>
-          <a href="/products" className="block text-pink-200 hover:text-white transition-colors">Products</a>
-          <a href="/cart" className="block text-pink-200 hover:text-white transition-colors">Cart</a>
+          <Link to="/products" className="block text-pink-200 hover:text-white transition-colors">Products</Link>
+          <Link to="/cart" className="block text-pink-200 hover:text-white transition-colors">Cart</Link>
         </div>
         <div className="text-center md:text-left">
           <h5 className="font-bold mb-2">Company</h5>
-          <a href="/admin" className="block text-pink-200 hover:text-white transition-colors">Admin</a>
-          <a href="/about-us" className="block text-pink-200 hover:text-white transition-colors" aria-label="About Us page">About Us</a>
+          <Link to="/admin" className="block text-pink-200 hover:text-white transition-colors">Admin</Link>
+          <Link to="/about-us" className="block text-pink-200 hover:text-white transition-colors" aria-label="About Us page">About Us</Link>
         </div>
       </div>
       <div className="text-center md:text-right">
