@@ -66,10 +66,6 @@ const FeaturedProducts = () => {
   const visibleProducts = itemsPerView;
   const maxIndex = Math.max(0, products.length - visibleProducts);
 
-  // Uniform card sizing for consistent scrolling
-  const cardHeight = itemsPerView === 1 ? 520 : itemsPerView === 2 ? 460 : 420;
-  const imageHeight = itemsPerView === 1 ? 320 : itemsPerView === 2 ? 280 : 220;
-
   // Clamp activeIndex when itemsPerView or products change
   useEffect(() => {
     if (activeIndex > maxIndex) setActiveIndex(0);
@@ -115,35 +111,38 @@ const FeaturedProducts = () => {
                   className="flex-shrink-0 px-4"
                   style={{ minWidth: `${100 / visibleProducts}%` }}
                 >
-                  <div className="bg-white rounded-3xl shadow-xl p-4 sm:p-6 transform hover:scale-105 transition-all duration-300 border-2 border-pink-100 group flex flex-col justify-between"
-                    style={{ minHeight: `${cardHeight}px` }}
+                  <div
+                    className="relative rounded-3xl overflow-hidden shadow-xl border-2 border-pink-100 group"
+                    style={{ aspectRatio: '1 / 1' }}
                   >
-                    <div className="relative overflow-hidden rounded-2xl mb-4" style={{ height: `${imageHeight}px` }}>
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 bg-white"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="absolute bottom-4 left-4 right-4">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+
+                    <div className="absolute inset-0 flex flex-col justify-end items-center p-6 text-white">
+                      <h4 className="text-xl font-bold text-white mb-1 text-center">{product.name}</h4>
+                      <p className="text-sm text-white/90 mb-3 text-center">{product.description}</p>
+                      <div className="w-full flex items-center justify-between gap-3">
+                        <span className="text-2xl font-bold text-pink-300">${product.price}</span>
+                        <div className="flex gap-2">
                           <button
-                            className="w-full bg-white text-pink-600 py-2 rounded-full font-bold shadow-lg hover:bg-pink-50 transition-colors"
+                            className="bg-white text-pink-600 py-2 px-4 rounded-full font-bold shadow-lg hover:bg-pink-50 transition-colors"
                             onClick={() => setSelectedProduct(product)}
                           >
                             Quick View
                           </button>
+                          <button
+                            className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-4 py-2 rounded-full font-semibold shadow hover:shadow-lg transition-all"
+                            onClick={() => addToCart(product)}
+                          >
+                            Add
+                          </button>
                         </div>
                       </div>
-                    </div>
-                    <h4 className="text-xl font-bold text-gray-900 mb-2">{product.name}</h4>
-                    <p className="text-gray-600 text-sm mb-3">{product.description}</p>
-                    <div className="flex flex-col sm:flex-row items-center sm:items-center gap-3 mt-auto">
-                      <span className="text-2xl font-bold text-pink-600">${product.price}</span>
-                      <button className="flex-1 sm:flex-none w-full sm:w-auto bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-2 rounded-full font-semibold shadow hover:shadow-lg transition-all text-center"
-                        onClick={() => addToCart(product)}
-                      >
-                        Add to Cart
-                      </button>
                     </div>
                   </div>
                 </div>
