@@ -51,13 +51,7 @@ const ProductCollections = () => (
                 <h4 className="text-3xl font-extrabold mb-2 drop-shadow-lg">{collection.title}</h4>
                 <p className="text-lg mb-4 drop-shadow">{collection.products}</p>
                 <a
-                  href={
-                    index === 0
-                      ? '/collections/natural'
-                      : index === 1
-                      ? '/collections/luxury-wigs'
-                      : '/collections/hair-care-essentials'
-                  }
+                  href="/products"
                   className="bg-white text-gray-900 px-8 py-3 rounded-full font-bold shadow-xl hover:bg-gray-100 transition-all transform group-hover:scale-110"
                 >
                   Explore →
