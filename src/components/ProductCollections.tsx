@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const collections = [
   {
@@ -6,18 +7,21 @@ const collections = [
     image: 'https://images.unsplash.com/photo-1487412912498-0447578fcca8?auto=format&fit=crop&w=600&q=80',
     products: '50+ Products',
     bgColor: 'from-green-400 to-emerald-600',
+    link: '/products',
   },
   {
     title: 'Luxury Wigs',
     image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=80',
     products: '30+ Styles',
     bgColor: 'from-pink-400 to-rose-600',
+    link: '/products',
   },
   {
     title: 'Hair Care Essentials',
     image: 'https://images.unsplash.com/photo-1571875257727-256c39da42af?auto=format&fit=crop&w=600&q=80',
     products: '25+ Items',
     bgColor: 'from-blue-400 to-indigo-600',
+    link: '/products',
   },
 ];
 
@@ -50,12 +54,12 @@ const ProductCollections = () => (
               <div className="absolute inset-0 flex flex-col items-center justify-end pb-12 text-white">
                 <h4 className="text-3xl font-extrabold mb-2 drop-shadow-lg">{collection.title}</h4>
                 <p className="text-lg mb-4 drop-shadow">{collection.products}</p>
-                <a
-                  href="/products"
+                <Link
+                  to={collection.link}
                   className="bg-white text-gray-900 px-8 py-3 rounded-full font-bold shadow-xl hover:bg-gray-100 transition-all transform group-hover:scale-110"
                 >
                   Explore →
-                </a>
+                </Link>
               </div>
             </div>
           </div>
