@@ -16,7 +16,7 @@ const slides = [
     description: 'Shop essentials',
     image: '/Shop essentials.jpeg',
     cta: null,
-    bgGradient: 'from-brown-700 to-brand-accent',
+    bgGradient: 'from-brand-primary to-brand-secondary',
   },
   {
     title: 'Slay Every Look',
@@ -43,7 +43,7 @@ const HeroCarousel = () => {
   };
 
   return (
-    <div className="relative w-full h-[650px] overflow-hidden bg-gradient-to-br from-brown-50 to-brand-muted dark:bg-gray-900">
+    <div className="relative w-full h-[650px] overflow-hidden bg-gradient-to-br from-gray-100 to-brand-muted dark:bg-gray-900">
       {slides.map((slide, index) => (
         <div
           key={index}
@@ -54,10 +54,9 @@ const HeroCarousel = () => {
           <img
             src={slide.image}
             alt={slide.title}
-            className="w-full h-full object-cover opacity-50"
+            className="w-full h-full object-cover"
           />
-          <div className={`absolute inset-0 bg-gradient-to-r ${slide.bgGradient} opacity-70`}></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-center">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent flex items-center">
             <div className="max-w-7xl mx-auto px-8 w-full">
               <div className="max-w-3xl">
                 <h1 className="text-6xl font-heading text-white mb-6 animate-fadeIn drop-shadow-2xl leading-tight">
@@ -85,10 +84,6 @@ const HeroCarousel = () => {
               </div>
             </div>
           </div>
-          
-          {/* Decorative elements */}
-          <div className="absolute top-20 right-20 w-64 h-64 bg-gold-400 rounded-full opacity-20 blur-3xl animate-float"></div>
-          <div className="absolute bottom-20 left-20 w-80 h-80 bg-brand-accent rounded-full opacity-20 blur-3xl animate-float" style={{animationDelay: '1s'}}></div>
         </div>
       ))}
 
