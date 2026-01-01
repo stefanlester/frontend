@@ -13,6 +13,7 @@ type CartItem = {
   customerEmail?: string;
   customerPhone?: string;
   notes?: string;
+  stylistId?: number;
 };
 
 type CartContextType = {

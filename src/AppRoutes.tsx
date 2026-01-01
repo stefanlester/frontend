@@ -9,6 +9,7 @@ import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import Admin from './pages/Admin';
 import Booking from './pages/Booking';
+import LastMinuteBookings from './pages/LastMinuteBookings';
 
 import AboutUs from './pages/AboutUs';
 import NaturalCollection from './pages/NaturalCollection';
@@ -29,6 +30,7 @@ const AppRoutes = ({ onAuth }: { onAuth: (token: string, email: string) => void 
     <Route path="/checkout" element={<Checkout />} />
     <Route path="/admin" element={<Admin />} />
     <Route path="/booking" element={<Booking />} />
+    <Route path="/last-minute" element={<LastMinuteBookings />} />
     <Route path="/about-us" element={<AboutUs />} />
     <Route path="/collections/natural" element={<NaturalCollection />} />
     <Route path="/collections/luxury-wigs" element={<LuxuryWigs />} />

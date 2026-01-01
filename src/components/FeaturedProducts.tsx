@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { realProducts } from '../realProducts';
-import { useCart } from '../context/CartContext';
+import { useNavigate } from 'react-router-dom';
 
 type Product = {
   id: number;
@@ -13,7 +13,7 @@ type Product = {
 
 const FeaturedProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const { addToCart } = useCart();
+  const navigate = useNavigate();
 
   // Quick View modal state
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -100,7 +100,7 @@ const FeaturedProducts = () => {
                     </button>
                     <button
                       className="btn-gold py-2.5 px-5 shadow-lg group/btn"
-                      onClick={() => addToCart(product)}
+                      onClick={() => navigate('/booking', { state: { selectedService: product.name } })}
                     >
                       <span className="flex items-center gap-2">
                         <span>📅</span>
@@ -153,7 +153,7 @@ const FeaturedProducts = () => {
                   <div className="flex gap-3">
                     <button
                       className="flex-1 btn-gold text-lg py-4 group/btn"
-                      onClick={() => { addToCart(selectedProduct); setSelectedProduct(null); }}
+                      onClick={() => { navigate('/booking', { state: { selectedService: selectedProduct.name } }); setSelectedProduct(null); }}
                     >
                       <span className="flex items-center justify-center gap-2">
                         <span>📅</span>

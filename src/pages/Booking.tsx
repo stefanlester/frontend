@@ -1,7 +1,10 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { AuthContext } from '../App';
 import { createAppointment } from '../api';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import BookingCalendar from '../components/BookingCalendar';
+import TimeSlotGrid from '../components/TimeSlotGrid';
+import ServiceBundles from '../components/ServiceBundles';
 
 const services = [
   { name: 'Braids & Cornrows', duration: '2-4 hours', price: 150, depositPercent: 20 },
@@ -17,6 +20,8 @@ const services = [
 const Booking = () => {
   const authContext = useContext(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
+  const [bookingType, setBookingType] = useState<'single' | 'bundle'>('single');
   const [formData, setFormData] = useState({
     service: '',
     date: '',
@@ -28,6 +33,17 @@ const Booking = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Pre-fill service if passed from navigation
+  useEffect(() => {
+    const state = location.state as { selectedService?: string } | null;
+    if (state?.selectedService) {
+      setFormData(prev => ({ ...prev, service: state.selectedService! }));
+      setBookingType('single');
+    }
+    // Scroll to top when page loads
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [location.state]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,32 +91,82 @@ const Booking = () => {
 
   // Get today's date in YYYY-MM-DD format for min date
   const today = new Date().toISOString().split('T')[0];
+  
+  // Get selected service duration
+  const selectedService = services.find(s => s.name === formData.service);
+  const serviceDuration = selectedService ? parseInt(selectedService.duration.split('-')[0]) * 60 : 120; // Default 120 min
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-white py-12 px-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <div className="text-center mb-10">
           <h1 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-4">
             Book Your Appointment
           </h1>
           <p className="text-gray-600 text-lg">
-            Choose your service and select a convenient time
+            Choose your service, select a date, and pick your preferred time slot
           </p>
         </div>
 
+        {/* Toggle between Single Service and Bundle */}
+        <div className="flex justify-center gap-4 mb-8">
+          <button
+            type="button"
+            onClick={() => setBookingType('single')}
+            className={`px-8 py-4 rounded-xl font-bold text-lg transition-all ${
+              bookingType === 'single'
+                ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-xl scale-105'
+                : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-purple-400'
+            }`}
+          >
+            Single Service
+          </button>
+          <button
+            type="button"
+            onClick={() => setBookingType('bundle')}
+            className={`px-8 py-4 rounded-xl font-bold text-lg transition-all ${
+              bookingType === 'bundle'
+                ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-xl scale-105'
+                : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-purple-400'
+            }`}
+          >
+            🎁 Service Bundles (Save More!)
+          </button>
+        </div>
+
+        {bookingType === 'bundle' ? (
+          <ServiceBundles
+            onSelectBundle={(bundle) => {
+              // Add bundle services to cart and redirect
+              alert(`Bundle selected: ${bundle.name}\nThis will add all services to your cart.`);
+              // TODO: Implement cart integration for bundles
+            }}
+          />
+        ) : (
         <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 border-2 border-purple-100">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          {location.state?.selectedService && (
+            <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-xl animate-pulse">
+              <div className="flex items-center gap-3">
+                <span className="text-3xl">✨</span>
+                <div>
+                  <p className="text-green-800 font-bold text-lg">Service Pre-Selected!</p>
+                  <p className="text-green-700 text-sm">You've chosen: <span className="font-bold">{formData.service}</span></p>
+                </div>
+              </div>
+            </div>
+          )}
+          <form onSubmit={handleSubmit} className="space-y-8">
             {/* Service Selection */}
             <div>
-              <label className="block text-lg font-bold text-gray-900 mb-3">
-                Select Service *
+              <label className="block text-2xl font-bold text-gray-900 mb-4">
+                1️⃣ Select Service *
               </label>
               <select
                 name="service"
                 value={formData.service}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-4 rounded-xl border-2 border-purple-200 focus:border-purple-400 focus:outline-none text-gray-700 bg-white"
+                className="w-full px-6 py-4 rounded-xl border-2 border-purple-200 focus:border-purple-400 focus:outline-none text-gray-700 bg-white text-lg font-semibold shadow-sm"
               >
                 <option value="">Choose a service...</option>
                 {services.map((service) => (
@@ -109,54 +175,52 @@ const Booking = () => {
                   </option>
                 ))}
               </select>
+              {selectedService && (
+                <div className="mt-4 p-4 bg-purple-50 rounded-xl border border-purple-200">
+                  <p className="text-sm text-gray-700">
+                    <span className="font-semibold">💰 Price:</span> ${selectedService.price} 
+                    <span className="ml-4"><span className="font-semibold">⏱️ Duration:</span> {selectedService.duration}</span>
+                    <span className="ml-4"><span className="font-semibold">💳 Deposit:</span> ${(selectedService.price * 0.20).toFixed(2)} (20%)</span>
+                  </p>
+                </div>
+              )}
             </div>
 
-            {/* Date Selection */}
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-lg font-bold text-gray-900 mb-3">
-                  Preferred Date *
-                </label>
-                <input
-                  type="date"
-                  name="date"
-                  value={formData.date}
-                  onChange={handleChange}
-                  min={today}
-                  required
-                  className="w-full px-4 py-4 rounded-xl border-2 border-purple-200 focus:border-purple-400 focus:outline-none"
-                />
-              </div>
+            {/* Calendar and Time Slot Selection */}
+            {formData.service && (
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-2xl font-bold text-gray-900 mb-4">
+                    2️⃣ Choose Your Date
+                  </label>
+                  <BookingCalendar
+                    selectedDate={formData.date}
+                    onDateSelect={(date) => setFormData({ ...formData, date, time: '' })}
+                    unavailableDates={[]} // Will be populated from backend
+                  />
+                </div>
 
-              <div>
-                <label className="block text-lg font-bold text-gray-900 mb-3">
-                  Preferred Time *
-                </label>
-                <select
-                  name="time"
-                  value={formData.time}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-4 rounded-xl border-2 border-purple-200 focus:border-purple-400 focus:outline-none"
-                >
-                  <option value="">Select time...</option>
-                  <option value="09:00">9:00 AM</option>
-                  <option value="10:00">10:00 AM</option>
-                  <option value="11:00">11:00 AM</option>
-                  <option value="12:00">12:00 PM</option>
-                  <option value="13:00">1:00 PM</option>
-                  <option value="14:00">2:00 PM</option>
-                  <option value="15:00">3:00 PM</option>
-                  <option value="16:00">4:00 PM</option>
-                  <option value="17:00">5:00 PM</option>
-                  <option value="18:00">6:00 PM</option>
-                </select>
+                {formData.date && (
+                  <div>
+                    <label className="block text-2xl font-bold text-gray-900 mb-4">
+                      3️⃣ Pick Your Time Slot
+                    </label>
+                    <TimeSlotGrid
+                      selectedDate={formData.date}
+                      selectedTime={formData.time}
+                      onTimeSelect={(time) => setFormData({ ...formData, time })}
+                      serviceDuration={serviceDuration}
+                    />
+                  </div>
+                )}
+
               </div>
-            </div>
+            )}
 
             {/* Customer Information */}
-            <div className="space-y-6">
-              <h3 className="text-xl font-bold text-gray-900 pt-4">Contact Information</h3>
+            {formData.date && formData.time && (
+              <div className="space-y-6 pt-6 border-t-2 border-purple-100">
+                <h3 className="text-2xl font-bold text-gray-900">4️⃣ Contact Information</h3>
               
               <div>
                 <label className="block text-lg font-bold text-gray-900 mb-3">
@@ -219,6 +283,7 @@ const Booking = () => {
                 />
               </div>
             </div>
+            )}
 
             {error && (
               <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 text-red-600">
@@ -227,16 +292,20 @@ const Booking = () => {
             )}
 
             {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-5 rounded-xl font-bold text-lg shadow-lg hover:from-purple-700 hover:to-pink-700 transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? '⏳ Processing...' : '💳 Proceed to Payment (20% Deposit)'}
-            </button>
-            <p className="text-center text-sm text-gray-500 mt-2">
-              A 20% deposit is required to secure your appointment
-            </p>
+            {formData.date && formData.time && (
+              <>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-6 rounded-xl font-bold text-xl shadow-xl hover:from-purple-700 hover:to-pink-700 transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? '⏳ Processing...' : '💳 Proceed to Payment (20% Deposit)'}
+                </button>
+                <p className="text-center text-sm text-gray-500 mt-2">
+                  A 20% deposit of ${selectedService ? (selectedService.price * 0.20).toFixed(2) : '0.00'} is required to secure your appointment
+                </p>
+              </>
+            )}
           </form>
 
           <div className="mt-8 p-6 bg-purple-50 rounded-2xl border-2 border-purple-100">
@@ -249,6 +318,7 @@ const Booking = () => {
             </ul>
           </div>
         </div>
+        )}
       </div>
     </div>
   );

@@ -68,6 +68,12 @@ const Navbar = () => {
             📅 Book
           </Link>
           <Link 
+            to="/last-minute" 
+            className="text-red-600 dark:text-orange-400 font-semibold px-4 py-2 rounded-full hover:bg-red-100 dark:hover:bg-orange-900/30 transition-all duration-300 animate-pulse"
+          >
+            ⚡ Flash Deals
+          </Link>
+          <Link 
             to="/cart" 
             className="text-brand-primary dark:text-gold-300 font-semibold px-4 py-2 rounded-full hover:bg-brand-accent/10 dark:hover:bg-gold-400/10 hover:text-brand-accent dark:hover:text-gold-400 transition-all duration-300 relative"
           >
@@ -153,6 +159,13 @@ const Navbar = () => {
             onClick={() => setMenuOpen(false)}
           >
             📅 Book Appointment
+          </Link>
+          <Link 
+            to="/last-minute" 
+            className="w-full text-center py-3 text-red-600 dark:text-orange-400 font-bold hover:bg-red-100 dark:hover:bg-orange-900/30 transition-all duration-300 animate-pulse" 
+            onClick={() => setMenuOpen(false)}
+          >
+            ⚡ Flash Deals - Save 15%
           </Link>
           <Link 
             to="/cart" 

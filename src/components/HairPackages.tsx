@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useCart } from '../context/CartContext';
+import { useNavigate } from 'react-router-dom';
 
 const HairPackages: React.FC = () => {
-  const { addToCart } = useCart();
+  const navigate = useNavigate();
   const [activePackage, setActivePackage] = useState(0);
 
   const packages = [
@@ -128,7 +128,7 @@ const HairPackages: React.FC = () => {
                 {/* CTA Buttons */}
                 <div className="flex gap-4 pt-4">
                   <button
-                    onClick={() => addToCart(pkg)}
+                    onClick={() => navigate('/booking', { state: { selectedService: pkg.name } })}
                     className="flex-1 btn-gold py-4 text-lg group/btn"
                   >
                     <span className="flex items-center justify-center gap-2">

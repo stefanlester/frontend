@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { realProducts } from '../realProducts';
-import { useCart } from '../context/CartContext';
+import { useNavigate } from 'react-router-dom';
 
 type Product = {
   id: number;
@@ -17,7 +17,7 @@ const Products = () => {
   const [error, setError] = useState('');
   const [filter, setFilter] = useState('all');
   const [sortBy, setSortBy] = useState('featured');
-  const { addToCart } = useCart();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setProducts(realProducts);
@@ -32,7 +32,7 @@ const Products = () => {
   }, []);
 
   const handleAddToCart = (product: Product) => {
-    addToCart(product);
+    navigate('/booking', { state: { selectedService: product.name } });
   };
 
   if (loading) return (

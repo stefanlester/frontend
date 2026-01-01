@@ -33,7 +33,7 @@ const PromoBanner = () => (
           </div>
           <div className="flex gap-4">
             <Link
-              to="/products"
+              to="/booking"
               className="btn-gold px-8 py-4 text-lg font-bold shadow-2xl transform hover:scale-105 transition-all"
             >
               Book Now →

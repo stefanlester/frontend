@@ -89,6 +89,7 @@ export async function createAppointment(
     customerPhone: string;
     customerEmail: string;
     notes: string;
+    stylistId?: number;
   }
 ) {
   const res = await fetch(`${API_URL}/api/appointments`, {

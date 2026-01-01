@@ -2,6 +2,8 @@ import React, { useState, useContext } from 'react';
 import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../App';
+import BookingCalendar from '../components/BookingCalendar';
+import TimeSlotGrid from '../components/TimeSlotGrid';
 
 const Cart = () => {
   const { items, removeFromCart, updateQuantity, updateAppointmentDetails, total, itemCount } = useCart();
@@ -101,100 +103,97 @@ const Cart = () => {
                 {/* Expandable Appointment Details Form */}
                 {expandedItem === item.id && (
                   <div className="mt-6 pt-6 border-t-2 border-brown-200 animate-slideDown">
-                    <h4 className="font-bold text-gray-900 text-lg mb-4">📝 Appointment Details</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          📅 Preferred Date <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="date"
-                          value={item.date || ''}
-                          onChange={(e) => updateAppointmentDetails(item.id, { date: e.target.value })}
-                          min={new Date().toISOString().split('T')[0]}
-                          className="w-full px-4 py-3 rounded-xl border-2 border-brown-200 focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20 transition-all"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          🕐 Preferred Time <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                          value={item.time || ''}
-                          onChange={(e) => updateAppointmentDetails(item.id, { time: e.target.value })}
-                          className="w-full px-4 py-3 rounded-xl border-2 border-brown-200 focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20 transition-all"
-                          required
-                        >
-                          <option value="">Select time</option>
-                          <option value="09:00">09:00 AM</option>
-                          <option value="10:00">10:00 AM</option>
-                          <option value="11:00">11:00 AM</option>
-                          <option value="12:00">12:00 PM</option>
-                          <option value="13:00">01:00 PM</option>
-                          <option value="14:00">02:00 PM</option>
-                          <option value="15:00">03:00 PM</option>
-                          <option value="16:00">04:00 PM</option>
-                          <option value="17:00">05:00 PM</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          👤 Your Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={item.customerName || ''}
-                          onChange={(e) => updateAppointmentDetails(item.id, { customerName: e.target.value })}
-                          className="w-full px-4 py-3 rounded-xl border-2 border-brown-200 focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20 transition-all"
-                          placeholder="Enter your name"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          📱 Phone Number <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="tel"
-                          value={item.customerPhone || ''}
-                          onChange={(e) => updateAppointmentDetails(item.id, { customerPhone: e.target.value })}
-                          className="w-full px-4 py-3 rounded-xl border-2 border-brown-200 focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20 transition-all"
-                          placeholder="(555) 123-4567"
-                          required
-                        />
-                      </div>
-                      <div className="md:col-span-2">
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          📧 Email <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="email"
-                          value={item.customerEmail || auth?.email || ''}
-                          onChange={(e) => updateAppointmentDetails(item.id, { customerEmail: e.target.value })}
-                          className="w-full px-4 py-3 rounded-xl border-2 border-brown-200 focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20 transition-all"
-                          placeholder="your.email@example.com"
-                          required
-                        />
-                      </div>
-                      <div className="md:col-span-2">
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          💬 Special Requests (Optional)
-                        </label>
-                        <textarea
-                          value={item.notes || ''}
-                          onChange={(e) => updateAppointmentDetails(item.id, { notes: e.target.value })}
-                          rows={3}
-                          className="w-full px-4 py-3 rounded-xl border-2 border-brown-200 focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20 transition-all resize-none"
-                          placeholder="Any specific requirements or preferences?"
-                        />
-                      </div>
+                    <h4 className="font-bold text-gray-900 text-lg mb-6">📝 Appointment Details</h4>
+                    
+                    {/* Interactive Calendar */}
+                    <div className="mb-6">
+                      <label className="block text-md font-bold text-gray-700 mb-3">
+                        📅 Select Your Date
+                      </label>
+                      <BookingCalendar
+                        selectedDate={item.date || ''}
+                        onDateSelect={(date) => updateAppointmentDetails(item.id, { date, time: '' })}
+                        unavailableDates={[]}
+                      />
                     </div>
+
+                    {/* Time Slot Grid */}
+                    {item.date && (
+                      <div className="mb-6">
+                        <label className="block text-md font-bold text-gray-700 mb-3">
+                          🕐 Choose Your Time
+                        </label>
+                        <TimeSlotGrid
+                          selectedDate={item.date}
+                          selectedTime={item.time || ''}
+                          onTimeSelect={(time) => updateAppointmentDetails(item.id, { time })}
+                          serviceDuration={item.duration || 120}
+                        />
+                      </div>
+                    )}
+
+                    {/* Customer Information */}
                     {item.date && item.time && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            👤 Your Name <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={item.customerName || ''}
+                            onChange={(e) => updateAppointmentDetails(item.id, { customerName: e.target.value })}
+                            className="w-full px-4 py-3 rounded-xl border-2 border-brown-200 focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20 transition-all"
+                            placeholder="Enter your name"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            📱 Phone Number <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="tel"
+                            value={item.customerPhone || ''}
+                            onChange={(e) => updateAppointmentDetails(item.id, { customerPhone: e.target.value })}
+                            className="w-full px-4 py-3 rounded-xl border-2 border-brown-200 focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20 transition-all"
+                            placeholder="(555) 123-4567"
+                            required
+                          />
+                        </div>
+                        <div className="md:col-span-2">
+                          <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            📧 Email <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="email"
+                            value={item.customerEmail || auth?.email || ''}
+                            onChange={(e) => updateAppointmentDetails(item.id, { customerEmail: e.target.value })}
+                            className="w-full px-4 py-3 rounded-xl border-2 border-brown-200 focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20 transition-all"
+                            placeholder="your.email@example.com"
+                            required
+                          />
+                        </div>
+                        <div className="md:col-span-2">
+                          <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            💬 Special Requests (Optional)
+                          </label>
+                          <textarea
+                            value={item.notes || ''}
+                            onChange={(e) => updateAppointmentDetails(item.id, { notes: e.target.value })}
+                            rows={3}
+                            className="w-full px-4 py-3 rounded-xl border-2 border-brown-200 focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20 transition-all resize-none"
+                            placeholder="Any specific requirements or preferences?"
+                          />
+                        </div>
+                      </div>
+                    )}
+                    
+                    {item.date && item.time && item.customerName && item.customerPhone && item.customerEmail && (
                       <div className="mt-4 p-4 bg-green-50 rounded-xl border-2 border-green-200">
                         <p className="text-green-700 font-semibold flex items-center gap-2">
                           <span className="text-xl">✅</span>
-                          Booking details saved! Proceed to checkout when ready.
+                          Booking details complete! Proceed to checkout when ready.
                         </p>
                       </div>
                     )}
