@@ -2,32 +2,32 @@ import React from 'react';
 
 const categories = [
   {
-    name: 'Wigs & Extensions',
-    link: '/category/wigs-extensions',
-    icon: (
-      <svg width="36" height="36" fill="none" viewBox="0 0 36 36"><ellipse cx="18" cy="18" rx="16" ry="14" fill="#b983ff" opacity="0.18"/><path d="M12 24c0-4 2-8 6-8s6 4 6 8" stroke="#b983ff" strokeWidth="2" strokeLinecap="round"/><ellipse cx="18" cy="14" rx="4" ry="6" fill="#b983ff"/></svg>
-    ),
+    name: 'Braids & Knotless',
+    link: '/products',
+    count: '25+ styles',
+    icon: '🌟',
+    gradient: 'from-brown-400 to-brown-600'
   },
   {
-    name: 'Hair Care',
-    link: '/category/hair-care',
-    icon: (
-      <svg width="36" height="36" fill="none" viewBox="0 0 36 36"><ellipse cx="18" cy="18" rx="16" ry="14" fill="#10b981" opacity="0.18"/><path d="M18 10c-2 2-6 8-6 12a6 6 0 0012 0c0-4-4-10-6-12z" fill="#10b981"/></svg>
-    ),
+    name: 'Locs & Twists',
+    link: '/products',
+    count: '15+ styles',
+    icon: '✨',
+    gradient: 'from-gold-400 to-gold-600'
   },
   {
-    name: 'Styling Tools',
-    link: '/category/styling-tools',
-    icon: (
-      <svg width="36" height="36" fill="none" viewBox="0 0 36 36"><ellipse cx="18" cy="18" rx="16" ry="14" fill="#2563eb" opacity="0.18"/><rect x="15" y="10" width="6" height="16" rx="3" fill="#2563eb"/><rect x="17" y="6" width="2" height="6" rx="1" fill="#b983ff"/></svg>
-    ),
+    name: 'Weaves & Installs',
+    link: '/products',
+    count: '12+ styles',
+    icon: '💫',
+    gradient: 'from-brown-500 to-brand-primary'
   },
   {
-    name: 'Hair Accessories',
-    link: '/category/hair-accessories',
-    icon: (
-      <svg width="36" height="36" fill="none" viewBox="0 0 36 36"><ellipse cx="18" cy="18" rx="16" ry="14" fill="#fde68a" opacity="0.18"/><circle cx="18" cy="18" r="5" fill="#fde68a"/><rect x="10" y="17" width="16" height="2" rx="1" fill="#b983ff"/></svg>
-    ),
+    name: 'Color & Treatment',
+    link: '/products',
+    count: '8+ services',
+    icon: '🎨',
+    gradient: 'from-gold-500 to-brown-400'
   },
 ];
 
@@ -40,16 +40,25 @@ const CategoryCards = () => (
     <h3 className="text-4xl font-heading font-extrabold text-center bg-gradient-to-r from-brand-accent to-brand-primary bg-clip-text text-transparent drop-shadow-lg mb-14 relative z-10">
       Shop by Category
     </h3>
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 max-w-6xl mx-auto relative z-10">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto relative z-10">
       {categories.map((cat, idx) => (
         <a
           key={idx}
           href={cat.link}
-          className="backdrop-blur-xl bg-white/60 dark:bg-gray-900/60 border border-brand-muted rounded-2xl shadow-xl p-10 flex flex-col items-center transition-all duration-300 group hover:scale-105 hover:shadow-2xl hover:border-brand-accent hover:-translate-y-2 relative overflow-hidden"
-          style={{boxShadow:'0 8px 32px 0 rgba(31, 38, 135, 0.12)'}}
+          className="group relative bg-white rounded-2xl shadow-brown-lg border-2 border-brown-200 p-8 transition-all duration-300 hover:scale-105 hover:shadow-brown-lg hover:border-gold-400 hover:-translate-y-2 overflow-hidden"
         >
-          <div className="mb-5">{cat.icon}</div>
-          <h4 className="text-lg font-heading font-semibold text-brand-primary dark:text-brand-accent text-center mb-2 drop-shadow-sm">{cat.name}</h4>
+          {/* Gradient background on hover */}
+          <div className={`absolute inset-0 bg-gradient-to-br ${cat.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+          
+          <div className="relative z-10">
+            <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">{cat.icon}</div>
+            <h4 className="text-xl font-heading font-bold text-brand-primary mb-2 group-hover:text-gold-600 transition-colors">{cat.name}</h4>
+            <p className="text-sm text-gray-500 font-semibold">{cat.count}</p>
+            <div className="mt-4 flex items-center text-gold-600 font-semibold text-sm group-hover:translate-x-2 transition-transform">
+              <span>Explore</span>
+              <span className="ml-1">→</span>
+            </div>
+          </div>
         </a>
       ))}
     </div>

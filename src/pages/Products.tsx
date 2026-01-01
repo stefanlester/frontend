@@ -6,6 +6,7 @@ type Product = {
   id: number;
   name: string;
   price: number;
+  duration: number; // in minutes
   image: string;
   description: string;
 };
@@ -46,44 +47,44 @@ const Products = () => {
   );
 
   return (
-    <div className="py-12 px-4 bg-white min-h-[80vh] relative overflow-hidden">
+    <div className="py-16 px-4 min-h-[80vh] relative overflow-hidden">
       {/* Decorative polymorphic shapes */}
-      <div className="absolute top-10 left-10 w-64 h-64 bg-gradient-to-br from-pink-300 to-purple-400 opacity-20 blur-3xl rounded-tl-[5rem] rounded-br-[5rem]"></div>
-      <div className="absolute bottom-20 right-20 w-72 h-72 bg-gradient-to-br from-yellow-300 to-pink-400 opacity-20 blur-3xl rounded-tr-[6rem] rounded-bl-[6rem]"></div>
-      <div className="absolute top-1/2 left-1/2 w-48 h-48 bg-gradient-to-br from-blue-300 to-cyan-400 opacity-15 blur-3xl rounded-full"></div>
+      <div className="absolute top-10 left-10 w-80 h-80 bg-gradient-to-br from-brown-300 to-gold-300 opacity-20 blur-3xl rounded-tl-[5rem] rounded-br-[5rem] animate-float"></div>
+      <div className="absolute bottom-20 right-20 w-96 h-96 bg-gradient-to-br from-brand-lighter to-brown-400 opacity-20 blur-3xl rounded-tr-[6rem] rounded-bl-[6rem]"></div>
+      <div className="absolute top-1/2 left-1/2 w-72 h-72 bg-gradient-to-br from-gold-200 to-brown-200 opacity-15 blur-3xl rounded-full animate-float" style={{animationDelay: '1s'}}></div>
       
-      <h2 className="text-4xl font-extrabold text-pink-700 mb-4 text-center drop-shadow relative z-10">Our Featured Products</h2>
-      <p className="text-center text-gray-600 mb-10 text-lg relative z-10">Premium quality hair products for every style</p>
+      <h2 className="text-5xl font-extrabold gradient-text mb-4 text-center drop-shadow-lg relative z-10 font-heading animate-fadeIn">Our Featured Services</h2>
+      <p className="text-center text-brand-primary mb-12 text-xl relative z-10 font-body">Premium quality hair services for every style</p>
       
       
       {/* Filters */}
       <div className="max-w-6xl mx-auto mb-10 flex flex-wrap gap-4 justify-center relative z-10">
         <button
           onClick={() => setFilter('all')}
-          className={`px-6 py-2 rounded-full font-semibold transition-all ${
+          className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
             filter === 'all'
-              ? 'bg-pink-600 text-white shadow-lg'
-              : 'bg-white text-gray-700 hover:bg-pink-50'
+              ? 'bg-gradient-brown text-white shadow-brown'
+              : 'bg-white text-brand-primary hover:bg-brown-50 border border-brown-200'
           }`}
         >
           All Products
         </button>
         <button
           onClick={() => setFilter('wigs')}
-          className={`px-6 py-2 rounded-full font-semibold transition-all ${
+          className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
             filter === 'wigs'
-              ? 'bg-pink-600 text-white shadow-lg'
-              : 'bg-white text-gray-700 hover:bg-pink-50'
+              ? 'bg-gradient-brown text-white shadow-brown'
+              : 'bg-white text-brand-primary hover:bg-brown-50 border border-brown-200'
           }`}
         >
           Wigs & Extensions
         </button>
         <button
           onClick={() => setFilter('care')}
-          className={`px-6 py-2 rounded-full font-semibold transition-all ${
+          className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
             filter === 'care'
-              ? 'bg-pink-600 text-white shadow-lg'
-              : 'bg-white text-gray-700 hover:bg-pink-50'
+              ? 'bg-gradient-brown text-white shadow-brown'
+              : 'bg-white text-brand-primary hover:bg-brown-50 border border-brown-200'
           }`}
         >
           Hair Care
@@ -91,7 +92,7 @@ const Products = () => {
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value)}
-          className="px-6 py-2 rounded-full border-2 border-pink-200 font-semibold focus:outline-none focus:ring-2 focus:ring-pink-400"
+          className="px-6 py-3 rounded-full border-2 border-brown-300 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-accent bg-white text-brand-primary transition-all"
         >
           <option value="featured">Featured</option>
           <option value="price-low">Price: Low to High</option>
@@ -105,19 +106,19 @@ const Products = () => {
             <button
               key={cat}
               onClick={() => setFilter(cat)}
-              className={`px-6 py-2 rounded-full font-semibold transition-all ${
+              className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${
                 filter === cat
-                  ? 'bg-pink-600 text-white shadow-lg'
-                  : 'bg-white text-gray-700 hover:bg-pink-50'
+                  ? 'bg-gradient-brown text-white shadow-brown'
+                  : 'bg-white text-brand-primary hover:bg-brown-50 border border-brown-200'
               }`}
             >
-              {cat === 'all' ? 'All Products' : cat}
+              {cat === 'all' ? 'All Services' : cat}
             </button>
           ))}
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="px-6 py-2 rounded-full border-2 border-pink-200 font-semibold focus:outline-none focus:ring-2 focus:ring-pink-400"
+            className="px-6 py-3 rounded-full border-2 border-brown-300 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-accent bg-white text-brand-primary transition-all"
           >
             <option value="featured">Featured</option>
             <option value="price-low">Price: Low to High</option>
@@ -131,7 +132,7 @@ const Products = () => {
           // grouped by category
           Array.from(new Set(products.map((p) => (p as any).category || 'Uncategorized'))).map((cat) => (
             <div key={cat}>
-              <h3 className="text-2xl font-bold mb-4">{cat}</h3>
+              <h3 className="text-3xl font-bold mb-6 gradient-text font-heading">{cat}</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                 {products.filter((p) => (p as any).category === cat).map((product: any, idx) => (
                   <ProductCard key={product.id} product={product} idx={idx} onAdd={handleAddToCart} />
@@ -161,33 +162,40 @@ function ProductCard({ product, idx, onAdd }: { product: any; idx: number; onAdd
     'rounded-tr-[3rem] rounded-bl-[3rem]',
   ];
   const borderColors = [
-    'border-pink-200 shadow-pink-200/50',
-    'border-purple-200 shadow-purple-200/50',
-    'border-blue-200 shadow-blue-200/50',
+    'border-brown-200 shadow-brown',
+    'border-gold-200 shadow-gold',
+    'border-brand-lighter shadow-brown',
   ];
 
   return (
     <div
       className={
-        `bg-white ${shapes[idx % shapes.length]} shadow-xl p-6 flex flex-col items-center transition-transform transform hover:-translate-y-2 hover:shadow-2xl group border-2 ${borderColors[idx % borderColors.length]} relative overflow-hidden ` +
-        (idx === 0 ? 'animate-pulse-slow' : '')
+        `bg-white ${shapes[idx % shapes.length]} shadow-lg p-6 flex flex-col items-center transition-all duration-300 transform hover:-translate-y-3 hover:shadow-brown-lg group border-2 ${borderColors[idx % borderColors.length]} relative overflow-hidden` +
+        (idx === 0 ? ' animate-pulse-slow' : '')
       }
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-pink-50 to-purple-50 opacity-0 group-hover:opacity-30 transition-opacity"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-brown-50 to-gold-50 opacity-0 group-hover:opacity-40 transition-opacity duration-300"></div>
       {idx === 0 && (
-        <span className="absolute top-4 left-4 bg-gradient-to-r from-yellow-400 to-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg animate-bounce z-10">Best Seller</span>
+        <span className="badge-gold absolute top-4 left-4 shadow-lg animate-bounce z-10">✨ Best Seller</span>
       )}
-      <div className="w-44 h-44 mb-4 overflow-hidden rounded-2xl shadow group-hover:scale-105 transition-transform relative z-10">
-        <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+      <div className="relative w-44 h-44 mb-5 overflow-hidden rounded-2xl shadow-brown group-hover:shadow-brown-lg transition-all duration-300 z-10">
+        <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+        <div className="absolute inset-0 bg-gradient-brown opacity-0 group-hover:opacity-20 transition-opacity"></div>
       </div>
-      <h3 className="text-xl font-bold text-gray-900 mb-1 text-center relative z-10">{product.name}</h3>
-      <p className="text-pink-600 font-bold text-lg mb-1 relative z-10">${product.price}</p>
-      <p className="text-gray-600 text-sm mb-4 text-center relative z-10">{product.description}</p>
+      <h3 className="text-xl font-bold text-brand-primary mb-2 text-center relative z-10 font-heading group-hover:text-brand-accent transition-colors">{product.name}</h3>
+      <div className="flex items-center gap-3 mb-2 relative z-10">
+        <p className="gradient-text-gold font-extrabold text-2xl">${product.price}</p>
+        <span className="text-brown-600 text-sm font-medium px-3 py-1 bg-brown-100 rounded-full">⏱️ {product.duration} min</span>
+      </div>
+      <p className="text-gray-600 text-sm mb-6 text-center relative z-10 line-clamp-2">{product.description}</p>
       <button
         onClick={() => onAdd(product)}
-        className="mt-auto bg-gradient-to-r from-pink-500 to-pink-700 text-white px-6 py-2 rounded-full font-semibold shadow hover:from-pink-600 hover:to-pink-800 hover:scale-105 transition-all relative z-10 w-full"
-      >
-        🛒 Add to Cart
+        className="mt-auto w-full relative overflow-hidden group/btn">
+        <div className="btn-gold w-full py-3 text-base font-bold flex items-center justify-center gap-2">
+          <span className="text-xl">📅</span>
+          <span>Book Appointment</span>
+          <span className="group-hover/btn:translate-x-1 transition-transform">→</span>
+        </div>
       </button>
     </div>
   );

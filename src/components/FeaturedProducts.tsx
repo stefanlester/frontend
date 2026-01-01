@@ -6,13 +6,13 @@ type Product = {
   id: number;
   name: string;
   price: number;
+  duration: number; // in minutes
   image: string;
   description: string;
 };
 
 const FeaturedProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [activeIndex, setActiveIndex] = useState(0);
   const { addToCart } = useCart();
 
   // Quick View modal state
@@ -45,165 +45,124 @@ const FeaturedProducts = () => {
   }, [selectedProduct]);
 
   useEffect(() => {
-    setProducts(realProducts);
+    // Display first 9 products (3 rows x 3 columns)
+    setProducts(realProducts.slice(0, 9));
   }, []);
-
-  // Responsive items per view: 1 on small, 2 on medium, 3 on large
-  const [itemsPerView, setItemsPerView] = useState(3);
-
-  useEffect(() => {
-    function updateItemsPerView() {
-      const w = window.innerWidth;
-      if (w < 640) setItemsPerView(1);
-      else if (w < 1024) setItemsPerView(2);
-      else setItemsPerView(3);
-    }
-    updateItemsPerView();
-    window.addEventListener('resize', updateItemsPerView);
-    return () => window.removeEventListener('resize', updateItemsPerView);
-  }, []);
-
-  const visibleProducts = itemsPerView;
-  const maxIndex = Math.max(0, products.length - visibleProducts);
-
-  // Clamp activeIndex when itemsPerView or products change
-  useEffect(() => {
-    if (activeIndex > maxIndex) setActiveIndex(0);
-  }, [activeIndex, maxIndex]);
-
-  const next = () => {
-    setActiveIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
-  };
-
-  const prev = () => {
-    setActiveIndex((prev) => (prev <= 0 ? maxIndex : prev - 1));
-  };
-
-  useEffect(() => {
-    const timer = setInterval(next, 4000);
-    return () => clearInterval(timer);
-  }, [maxIndex, itemsPerView]);
 
   if (products.length === 0) return null;
 
   return (
-    <section className="py-16 px-4 bg-white relative overflow-hidden">
-      <div className="absolute top-0 left-0 w-96 h-96 bg-pink-200 rounded-full opacity-20 blur-3xl"></div>
-      <div className="absolute bottom-0 right-0 w-80 h-80 bg-purple-200 rounded-full opacity-20 blur-3xl"></div>
+    <section className="py-20 px-4 relative overflow-hidden">
+      <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-brown-200 to-gold-200 rounded-full opacity-20 blur-3xl animate-float"></div>
+      <div className="absolute bottom-0 right-0 w-80 h-80 bg-gradient-to-br from-brand-lighter to-brown-300 rounded-full opacity-20 blur-3xl"></div>
       
       <div className="max-w-7xl mx-auto relative z-10">
-        <h3 className="text-4xl font-extrabold text-center mb-4">
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-purple-600">
-            Featured Products
+        <h3 className="text-5xl font-extrabold text-center mb-4 font-heading">
+          <span className="gradient-text animate-fadeIn">
+            Featured Services
           </span>
         </h3>
-        <p className="text-center text-gray-600 mb-12 text-lg">Discover our most popular items</p>
+        <p className="text-center text-brand-primary mb-16 text-xl font-body">Discover our most popular beauty services</p>
 
-        <div className="relative">
-          <div className="overflow-hidden">
+        {/* Grid Layout - 3 columns x 3 rows */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {products.map((product) => (
             <div
-              className="flex transition-transform duration-500 ease-out"
-              style={{ transform: `translateX(-${activeIndex * (100 / visibleProducts)}%)` }}
+              key={product.id}
+              className="relative rounded-3xl overflow-hidden shadow-brown-lg border-2 border-brown-200 group hover:border-gold-400 transition-all duration-300 animate-fadeIn"
+              style={{ aspectRatio: '1 / 1' }}
             >
-              {products.map((product) => (
-                <div
-                  key={product.id}
-                  className="flex-shrink-0 px-4"
-                  style={{ minWidth: `${100 / visibleProducts}%` }}
-                >
-                  <div
-                    className="relative rounded-3xl overflow-hidden shadow-xl border-2 border-pink-100 group"
-                    style={{ aspectRatio: '1 / 1' }}
-                  >
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
+              <img
+                src={product.image}
+                alt={product.name}
+                className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+              />
 
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-brown opacity-0 group-hover:opacity-30 transition-opacity"></div>
 
-                    <div className="absolute inset-0 flex flex-col justify-end items-center p-6 text-white">
-                      <h4 className="text-xl font-bold text-white mb-1 text-center">{product.name}</h4>
-                      <p className="text-sm text-white/90 mb-3 text-center">{product.description}</p>
-                      <div className="w-full flex items-center justify-between gap-3">
-                        <span className="text-2xl font-bold text-pink-300">${product.price}</span>
-                        <div className="flex gap-2">
-                          <button
-                            className="bg-white text-pink-600 py-2 px-4 rounded-full font-bold shadow-lg hover:bg-pink-50 transition-colors"
-                            onClick={() => setSelectedProduct(product)}
-                          >
-                            Quick View
-                          </button>
-                          <button
-                            className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-4 py-2 rounded-full font-semibold shadow hover:shadow-lg transition-all"
-                            onClick={() => addToCart(product)}
-                          >
-                            Add
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+              <div className="absolute inset-0 flex flex-col justify-end items-start p-8 text-white">
+                <h4 className="text-2xl font-bold text-white mb-2 font-heading group-hover:scale-105 transition-transform">{product.name}</h4>
+                <p className="text-sm text-white/90 mb-4 line-clamp-2">{product.description}</p>
+                <div className="w-full flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <span className="text-3xl font-extrabold gradient-text-gold bg-white bg-clip-text px-2 py-1 rounded">${product.price}</span>
+                    <span className="px-3 py-1 bg-brown-100 text-brand-primary rounded-full text-sm font-semibold flex items-center gap-1">
+                      <span>⏱️</span> {product.duration} min
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      className="bg-white/90 backdrop-blur-sm text-brand-primary py-2.5 px-5 rounded-full font-bold shadow-lg hover:bg-white hover:scale-105 transition-all"
+                      onClick={() => setSelectedProduct(product)}
+                    >
+                      Quick View
+                    </button>
+                    <button
+                      className="btn-gold py-2.5 px-5 shadow-lg group/btn"
+                      onClick={() => addToCart(product)}
+                    >
+                      <span className="flex items-center gap-2">
+                        <span>📅</span>
+                        <span>Book Now</span>
+                        <span className="group-hover/btn:translate-x-1 transition-transform">→</span>
+                      </span>
+                    </button>
                   </div>
                 </div>
-              ))}
+              </div>
             </div>
-          </div>
-
-          {/* Navigation Buttons */}
-          <button
-            onClick={prev}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white text-pink-600 p-4 rounded-full shadow-xl hover:bg-pink-50 transition-all z-10"
-            aria-label="Previous products"
-          >
-            ←
-          </button>
-          <button
-            onClick={next}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white text-pink-600 p-4 rounded-full shadow-xl hover:bg-pink-50 transition-all z-10"
-            aria-label="Next products"
-          >
-            →
-          </button>
-        </div>
-
-        {/* Indicators */}
-        <div className="flex justify-center gap-2 mt-8">
-          {Array.from({ length: maxIndex + 1 }).map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setActiveIndex(index)}
-              className={`h-2 rounded-full transition-all ${
-                index === activeIndex ? 'bg-pink-600 w-8' : 'bg-pink-300 w-2'
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
           ))}
         </div>
+        
         {/* Quick View Modal */}
         {selectedProduct && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <div className="absolute inset-0 bg-black/50" onClick={() => setSelectedProduct(null)} />
-            <div className="relative bg-white rounded-2xl shadow-2xl max-w-3xl w-full mx-4 p-6 z-10">
-              <div className="flex flex-col md:flex-row gap-6">
-                <div className="md:w-1/2 rounded-2xl overflow-hidden bg-gray-100 flex items-center justify-center" style={{minHeight:200}}>
-                  <img src={selectedProduct.image} alt={selectedProduct.name} className="w-full h-full object-contain" />
+          <div className="fixed inset-0 z-50 flex items-center justify-center animate-fadeIn">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSelectedProduct(null)} />
+            <div className="relative card-elevated max-w-4xl w-full mx-4 p-8 z-10 animate-scaleIn">
+              <div className="flex flex-col md:flex-row gap-8">
+                <div className="md:w-1/2 rounded-2xl overflow-hidden bg-brown-50 flex items-center justify-center shadow-brown" style={{minHeight:300}}>
+                  <img src={selectedProduct.image} alt={selectedProduct.name} className="w-full h-full object-cover" />
                 </div>
                 <div className="md:w-1/2 flex flex-col justify-between">
                   <div>
-                    <h4 className="text-2xl font-bold mb-2">{selectedProduct.name}</h4>
-                    <p className="text-gray-600 mb-4">{selectedProduct.description}</p>
-                    <p className="text-3xl font-extrabold text-pink-600 mb-6">${selectedProduct.price}</p>
+                    <h4 className="text-3xl font-bold mb-3 gradient-text font-heading">{selectedProduct.name}</h4>
+                    <p className="text-gray-600 mb-5 text-lg leading-relaxed">{selectedProduct.description}</p>
+                    <div className="flex items-center gap-4 mb-6">
+                      <p className="text-4xl font-extrabold gradient-text-gold">${selectedProduct.price}</p>
+                      <span className="px-4 py-2 bg-brown-100 text-brand-primary rounded-full text-base font-semibold flex items-center gap-2">
+                        <span>⏱️</span> {selectedProduct.duration} min
+                      </span>
+                    </div>
+                    {/* Features */}
+                    <div className="space-y-2 mb-6">
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <span className="text-xl">✨</span>
+                        <span>Professional Service</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <span className="text-xl">💝</span>
+                        <span>Premium Quality</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <span className="text-xl">🎯</span>
+                        <span>Satisfaction Guaranteed</span>
+                      </div>
+                    </div>
                   </div>
                   <div className="flex gap-3">
                     <button
-                      className="flex-1 bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-3 rounded-full font-semibold shadow hover:shadow-lg transition-all"
+                      className="flex-1 btn-gold text-lg py-4 group/btn"
                       onClick={() => { addToCart(selectedProduct); setSelectedProduct(null); }}
                     >
-                      Add to Cart
+                      <span className="flex items-center justify-center gap-2">
+                        <span>📅</span>
+                        <span>Book Appointment</span>
+                        <span className="group-hover/btn:translate-x-1 transition-transform">→</span>
+                      </span>
                     </button>
                     <button
-                      className="flex-0 px-6 py-3 rounded-full border-2 border-gray-200 hover:bg-gray-50 transition"
+                      className="btn-secondary px-6"
                       onClick={() => setSelectedProduct(null)}
                     >
                       Close

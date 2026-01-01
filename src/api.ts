@@ -77,3 +77,43 @@ export async function createOrder(order: { items: any[]; total: number; customer
   if (!res.ok) throw new Error('Failed to create order');
   return res.json();
 }
+
+// Appointments
+export async function createAppointment(
+  token: string,
+  appointment: {
+    service: string;
+    date: string;
+    time: string;
+    customerName: string;
+    customerPhone: string;
+    customerEmail: string;
+    notes: string;
+  }
+) {
+  const res = await fetch(`${API_URL}/api/appointments`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(appointment),
+  });
+  if (!res.ok) throw new Error((await res.json()).error || 'Failed to create appointment');
+  return res.json();
+}
+
+export async function fetchAppointments() {
+  const res = await fetch(`${API_URL}/api/appointments`);
+  if (!res.ok) throw new Error('Failed to fetch appointments');
+  return res.json();
+}
+
+export async function fetchMyAppointments(token: string) {
+  const res = await fetch(`${API_URL}/api/appointments/my`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('Failed to fetch appointments');
+  return res.json();
+}
+

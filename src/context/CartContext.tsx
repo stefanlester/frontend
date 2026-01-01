@@ -6,13 +6,21 @@ type CartItem = {
   price: number;
   image: string;
   quantity: number;
+  duration?: number;
+  date?: string;
+  time?: string;
+  customerName?: string;
+  customerEmail?: string;
+  customerPhone?: string;
+  notes?: string;
 };
 
 type CartContextType = {
   items: CartItem[];
-  addToCart: (product: { id: number; name: string; price: number; image: string }) => void;
+  addToCart: (product: { id: number; name: string; price: number; image: string; duration?: number }) => void;
   removeFromCart: (id: number) => void;
   updateQuantity: (id: number, quantity: number) => void;
+  updateAppointmentDetails: (id: number, details: Partial<CartItem>) => void;
   clearCart: () => void;
   total: number;
   itemCount: number;
@@ -23,7 +31,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([]);
 
-  const addToCart = (product: { id: number; name: string; price: number; image: string }) => {
+  const addToCart = (product: { id: number; name: string; price: number; image: string; duration?: number }) => {
     setItems((prev) => {
       const existing = prev.find((item) => item.id === product.id);
       if (existing) {
@@ -31,8 +39,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
-      return [...prev, { ...product, quantity: 1 }];
+      return [...prev, { ...product, quantity: 1, duration: product.duration }];
     });
+  };
+
+  const updateAppointmentDetails = (id: number, details: Partial<CartItem>) => {
+    setItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, ...details } : item))
+    );
   };
 
   const removeFromCart = (id: number) => {
@@ -58,7 +72,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <CartContext.Provider
-      value={{ items, addToCart, removeFromCart, updateQuantity, clearCart, total, itemCount }}
+      value={{ items, addToCart, removeFromCart, updateQuantity, updateAppointmentDetails, clearCart, total, itemCount }}
     >
       {children}
     </CartContext.Provider>

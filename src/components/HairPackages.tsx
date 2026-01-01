@@ -1,60 +1,159 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useCart } from '../context/CartContext';
 
 const HairPackages: React.FC = () => {
-  // Use real product images for the packages
+  const { addToCart } = useCart();
+  const [activePackage, setActivePackage] = useState(0);
+
   const packages = [
     {
-      name: 'Barrel Twist Style 1',
-      description: 'Classic barrel twist for a bold look.',
-      price: '$120',
-      image: '/HAIR PICS/BARREL TWIST/PHOTO-2025-12-18-18-33-23.jpg',
+      id: 22,
+      name: 'Fulani Braids',
+      tagline: 'Authentic African Beauty',
+      description: 'Authentic Fulani tribal braids with intricate patterns and beading.',
+      price: 142,
+      duration: 240,
+      image: '/LEMONADES, FULANI BRAIDS/WhatsApp Image 2025-12-21 at 15.20.30 (2).jpeg',
+      category: 'Lemonades & Fulani Braids',
+      badge: '🔥 Most Popular'
     },
     {
-      name: 'Frontal Lace Install 1',
-      description: 'Natural frontal lace installation.',
-      price: '$200',
+      id: 7,
+      name: 'Closure/Frontal Weaves',
+      tagline: 'Seamless Perfection',
+      description: 'Professional closure or frontal weave installation for natural look.',
+      price: 80,
+      duration: 180,
       image: '/HAIR PICS/FRONTAL LACE INSTALL/WhatsApp Image 2025-12-21 at 12.22.45 (1).jpeg',
+      category: 'Weaves & Sew-ins',
+      badge: '✨ Best Value'
     },
     {
-      name: 'Glam Makeover 1',
-      description: 'Professional makeover and glam beat.',
-      price: '$80',
-      image: '/HAIR PICS/MAKEOVERS AND GLAM BEATS/WhatsApp Image 2025-12-21 at 12.26.25 (1).jpeg',
+      id: 19,
+      name: 'Diva Braids',
+      tagline: 'Glamorous Statement',
+      description: 'Glamorous diva knotless braids that command attention.',
+      price: 170,
+      duration: 240,
+      image: '/WhatsApp Image 2025-12-27 at 19.22.12 (2).jpeg',
+      category: 'Goddess Braided Knotless',
+      badge: '💫 Signature'
     },
   ];
 
+  const pkg = packages[activePackage];
+
   return (
-    <section className="py-12 bg-white">
-      <div className="max-w-6xl mx-auto px-4">
-        <h2 className="text-3xl font-heading font-bold text-center text-brand-primary dark:text-brand-accent mb-8">Hair Packages</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-          {packages.map((pkg, idx) => (
-            <div
-              key={idx}
-              className="relative group rounded-2xl overflow-hidden shadow-lg border border-brand-muted bg-white dark:bg-gray-900 min-h-[420px] flex items-end justify-center transition-all duration-300 hover:scale-105 hover:shadow-2xl"
-              style={{minHeight:'420px'}}>
+    <section className="py-20 px-4 bg-gradient-to-br from-brown-50 via-background to-gold-50 relative overflow-hidden">
+      {/* Animated decorative elements */}
+      <div className="absolute top-10 right-10 w-72 h-72 bg-gradient-to-br from-gold-200 to-brown-200 rounded-full opacity-30 blur-3xl animate-float"></div>
+      <div className="absolute bottom-20 left-10 w-96 h-96 bg-gradient-to-br from-brown-300 to-gold-300 rounded-full opacity-20 blur-3xl animate-pulse"></div>
+      
+      <div className="max-w-7xl mx-auto relative z-10">
+        {/* Section Header */}
+        <div className="text-center mb-12 animate-fadeIn">
+          <span className="inline-block px-4 py-2 bg-gradient-gold text-white rounded-full text-sm font-bold mb-4 shadow-gold animate-shimmer">✨ SIGNATURE STYLES</span>
+          <h2 className="text-6xl font-heading font-extrabold gradient-text mb-4">Transform Your Look</h2>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">Experience our most sought-after hairstyles crafted by expert stylists</p>
+        </div>
+
+        {/* Split Screen Design */}
+        <div className="relative bg-white rounded-3xl shadow-brown-lg overflow-hidden border-2 border-brown-200 animate-scaleIn">
+          <div className="grid lg:grid-cols-2 gap-0">
+            {/* Left: Image Showcase */}
+            <div className="relative h-[600px] lg:h-auto group overflow-hidden">
               <img
                 src={pkg.image}
                 alt={pkg.name}
-                className="absolute inset-0 w-full h-full object-cover scale-110 group-hover:scale-125 transition-transform duration-500 z-0"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               />
-              <div className="relative z-10 w-full flex flex-col items-center p-8 bg-black/60 group-hover:bg-black/40 transition-colors duration-300">
-                <h3 className="text-2xl font-heading font-extrabold text-white mb-2 text-center" style={{textShadow:'0 4px 24px rgba(0,0,0,0.55), 0 1.5px 0 #a78bfa'}}>
-                  {pkg.name}
-                </h3>
-                <p className="text-lg text-white/80 mb-4 text-center font-medium" style={{textShadow:'0 2px 8px rgba(0,0,0,0.25)'}}>{pkg.description}</p>
-                <span className="text-xl font-bold text-brand-accent mb-2 drop-shadow">{pkg.price}</span>
-                <Link
-                  to="/cart"
-                  state={{ package: pkg }}
-                  className="mt-2 bg-brand-accent text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary hover:text-brand-accent transition text-center"
-                >
-                  Shop Now
-                </Link>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+              
+              {/* Badge Overlay */}
+              <div className="absolute top-6 left-6 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-full font-bold text-brand-primary shadow-lg animate-bounce">
+                {pkg.badge}
+              </div>
+              
+              {/* Navigation Dots */}
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3">
+                {packages.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActivePackage(idx)}
+                    className={`h-3 rounded-full transition-all duration-300 ${
+                      idx === activePackage ? 'bg-gold-400 w-12' : 'bg-white/60 w-3 hover:bg-white'
+                    }`}
+                  />
+                ))}
               </div>
             </div>
-          ))}
+
+            {/* Right: Content */}
+            <div className="p-12 flex flex-col justify-center bg-gradient-to-br from-white to-brown-50">
+              <div className="space-y-6">
+                <div>
+                  <p className="text-gold-600 font-semibold text-lg mb-2 tracking-wide">{pkg.tagline}</p>
+                  <h3 className="text-5xl font-heading font-extrabold text-brand-primary mb-4 leading-tight">{pkg.name}</h3>
+                  <p className="text-gray-600 text-lg leading-relaxed">{pkg.description}</p>
+                </div>
+
+                {/* Stats Grid */}
+                <div className="grid grid-cols-2 gap-4 py-6">
+                  <div className="text-center p-4 bg-white rounded-xl shadow-sm border border-brown-100">
+                    <div className="text-3xl font-extrabold gradient-text-gold">${pkg.price}</div>
+                    <div className="text-sm text-gray-500 mt-1">Investment</div>
+                  </div>
+                  <div className="text-center p-4 bg-white rounded-xl shadow-sm border border-brown-100">
+                    <div className="text-3xl font-extrabold text-brand-primary">{pkg.duration} min</div>
+                    <div className="text-sm text-gray-500 mt-1">Duration</div>
+                  </div>
+                </div>
+
+                {/* Features List */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 text-gray-700">
+                    <span className="text-2xl">✓</span>
+                    <span className="font-medium">Expert Stylist Included</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-gray-700">
+                    <span className="text-2xl">✓</span>
+                    <span className="font-medium">Premium Quality Products</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-gray-700">
+                    <span className="text-2xl">✓</span>
+                    <span className="font-medium">Complimentary Consultation</span>
+                  </div>
+                </div>
+
+                {/* CTA Buttons */}
+                <div className="flex gap-4 pt-4">
+                  <button
+                    onClick={() => addToCart(pkg)}
+                    className="flex-1 btn-gold py-4 text-lg group/btn"
+                  >
+                    <span className="flex items-center justify-center gap-2">
+                      <span>📅</span>
+                      <span>Book Now</span>
+                      <span className="group-hover/btn:translate-x-1 transition-transform">→</span>
+                    </span>
+                  </button>
+                  <button className="px-8 py-4 border-2 border-brown-300 text-brand-primary rounded-2xl font-bold hover:bg-brown-50 transition-all">
+                    View Details
+                  </button>
+                </div>
+
+                {/* Social Proof */}
+                <div className="flex items-center gap-2 pt-4 border-t border-brown-200">
+                  <div className="flex -space-x-2">
+                    {[1,2,3,4].map((i) => (
+                      <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-brown-300 to-gold-300 border-2 border-white"></div>
+                    ))}
+                  </div>
+                  <p className="text-sm text-gray-600"><span className="font-bold text-brand-primary">150+</span> happy clients this month</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -62,3 +161,4 @@ const HairPackages: React.FC = () => {
 };
 
 export default HairPackages;
+

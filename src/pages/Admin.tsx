@@ -9,6 +9,30 @@ async function fetchOrders() {
   return res.json();
 }
 
+// Fetch appointments from backend
+async function fetchAppointments() {
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const res = await fetch(`${apiUrl}/api/appointments`);
+  if (!res.ok) throw new Error('Failed to fetch appointments');
+  return res.json();
+}
+
+// Update appointment status
+async function updateAppointmentStatus(id: number, status: string) {
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const token = localStorage.getItem('token');
+  const res = await fetch(`${apiUrl}/api/appointments/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({ status }),
+  });
+  if (!res.ok) throw new Error('Failed to update appointment');
+  return res.json();
+}
+
 type Product = {
   id: number;
   name: string;
@@ -19,8 +43,9 @@ type Product = {
 
 const Admin = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'customers'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'customers' | 'appointments'>('products');
   const [orders, setOrders] = useState<any[]>([]);
+  const [appointments, setAppointments] = useState<any[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [newProduct, setNewProduct] = useState({
     name: '',
@@ -36,6 +61,9 @@ const Admin = () => {
   useEffect(() => {
     if (activeTab === 'orders') {
       fetchOrders().then(setOrders).catch(() => setOrders([]));
+    }
+    if (activeTab === 'appointments') {
+      fetchAppointments().then(setAppointments).catch(() => setAppointments([]));
     }
   }, [activeTab]);
 
@@ -68,7 +96,6 @@ const Admin = () => {
     }
   };
 
-  // Optional: implement edit functionality
   const handleEditProduct = async (id: number, updated: typeof newProduct) => {
     try {
       const product = await updateProduct(id, {
@@ -109,16 +136,16 @@ const Admin = () => {
               <div className="text-5xl">🛒</div>
               <span className="bg-white/20 px-3 py-1 rounded-full text-sm font-semibold">+8%</span>
             </div>
-            <h3 className="text-3xl font-bold mb-2">156</h3>
+            <h3 className="text-3xl font-bold mb-2">{orders.length}</h3>
             <p className="text-purple-100">Orders Today</p>
           </div>
           <div className="bg-gradient-to-br from-blue-400 to-cyan-600 rounded-tr-[3rem] rounded-bl-[3rem] p-8 text-white shadow-2xl transform hover:scale-105 transition-all cursor-pointer">
             <div className="flex justify-between items-start mb-4">
-              <div className="text-5xl">💰</div>
-              <span className="bg-white/20 px-3 py-1 rounded-full text-sm font-semibold">+23%</span>
+              <div className="text-5xl">📅</div>
+              <span className="bg-white/20 px-3 py-1 rounded-full text-sm font-semibold">+15%</span>
             </div>
-            <h3 className="text-3xl font-bold mb-2">$45,230</h3>
-            <p className="text-blue-100">Revenue</p>
+            <h3 className="text-3xl font-bold mb-2">{appointments.length}</h3>
+            <p className="text-blue-100">Appointments</p>
           </div>
         </div>
 
@@ -153,6 +180,16 @@ const Admin = () => {
             }`}
           >
             👥 Customers
+          </button>
+          <button
+            onClick={() => setActiveTab('appointments')}
+            className={`px-6 py-3 rounded-full font-bold transition-all ${
+              activeTab === 'appointments'
+                ? 'bg-purple-600 text-white shadow-lg'
+                : 'bg-white text-gray-700 hover:bg-purple-50'
+            }`}
+          >
+            📅 Appointments
           </button>
         </div>
 
@@ -231,7 +268,6 @@ const Admin = () => {
                     <p className="text-purple-600 font-bold mt-1">${product.price}</p>
                   </div>
                   <div className="flex gap-2">
-                    {/* Example: Edit button could open a modal or inline form. For now, just a placeholder. */}
                     <button
                       className="bg-blue-500 text-white px-4 py-2 rounded-full font-semibold hover:bg-blue-600 transition-all"
                       onClick={() => {
@@ -268,7 +304,7 @@ const Admin = () => {
                   <div>
                     <p className="font-bold text-lg">Order #{order.id}</p>
                     <p className="text-gray-600">Customer: {order.customer?.name || 'N/A'}</p>
-                    <p className="text-sm text-gray-500">Placed: {order.createdAt ? new Date(order.createdAt).toLocaleString() : 'N/A'}</p>
+                    <p className="text-sm text-gray-500">Placed: {order.date || 'N/A'}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-2xl font-bold text-purple-600">${order.total}</p>
@@ -299,6 +335,141 @@ const Admin = () => {
                   <div className="text-right">
                     <p className="text-sm text-gray-500">Total Orders</p>
                     <p className="text-2xl font-bold text-purple-600">{5 + idx * 3}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Appointments Tab */}
+        {activeTab === 'appointments' && (
+          <div className="bg-white rounded-3xl shadow-2xl p-8 border-2 border-purple-100">
+            <h3 className="text-2xl font-bold text-gray-900 mb-6">Appointment Bookings</h3>
+            <div className="space-y-4">
+              {appointments.length === 0 && (
+                <div className="text-center py-12 text-gray-500">
+                  <div className="text-6xl mb-4">📅</div>
+                  <p className="text-lg">No appointments booked yet</p>
+                </div>
+              )}
+              {appointments.map((appointment) => (
+                <div
+                  key={appointment.id}
+                  className="p-6 bg-gray-50 rounded-2xl border-2 border-gray-200 hover:border-purple-300 transition-colors"
+                >
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h4 className="font-bold text-xl text-gray-900">
+                          {appointment.service}
+                        </h4>
+                        <span
+                          className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                            appointment.status === 'confirmed'
+                              ? 'bg-green-100 text-green-700'
+                              : appointment.status === 'cancelled'
+                              ? 'bg-red-100 text-red-700'
+                              : appointment.status === 'pending_payment'
+                              ? 'bg-orange-100 text-orange-700'
+                              : 'bg-yellow-100 text-yellow-700'
+                          }`}
+                        >
+                          {appointment.status === 'pending_payment' && '💳 Awaiting Payment'}
+                          {appointment.status === 'pending' && '⏳ Pending Confirmation'}
+                          {appointment.status === 'confirmed' && '✅ Confirmed'}
+                          {appointment.status === 'cancelled' && '❌ Cancelled'}
+                          {appointment.status === 'completed' && '✨ Completed'}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                        <div>
+                          <p className="font-semibold text-gray-700">📅 Date & Time</p>
+                          <p>{new Date(appointment.date).toLocaleDateString()} at {appointment.time}</p>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-700">👤 Customer</p>
+                          <p>{appointment.customerName}</p>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-700">📧 Email</p>
+                          <p>{appointment.customerEmail}</p>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-700">📱 Phone</p>
+                          <p>{appointment.customerPhone}</p>
+                        </div>
+                      </div>
+                      {appointment.notes && (
+                        <div className="mt-3 p-3 bg-purple-50 rounded-lg">
+                          <p className="font-semibold text-gray-700 text-sm">📝 Notes:</p>
+                          <p className="text-sm text-gray-600">{appointment.notes}</p>
+                        </div>
+                      )}
+                      {appointment.depositPaid && (
+                        <div className="mt-3 p-3 bg-green-50 rounded-lg">
+                          <p className="font-semibold text-green-700 text-sm">
+                            ✅ Deposit Paid: ${appointment.depositAmount?.toFixed(2) || '0.00'}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex gap-2 pt-4 border-t-2 border-gray-200">
+                    {appointment.status !== 'pending_payment' && (
+                      <>
+                    <button
+                      onClick={async () => {
+                        try {
+                          await updateAppointmentStatus(appointment.id, 'confirmed');
+                          const updated = await fetchAppointments();
+                          setAppointments(updated);
+                          alert('✅ Appointment confirmed!');
+                        } catch {
+                          alert('Failed to update appointment');
+                        }
+                      }}
+                      className="px-4 py-2 bg-green-500 text-white rounded-full font-semibold hover:bg-green-600 transition-all text-sm"
+                    >
+                      ✅ Confirm
+                    </button>
+                    <button
+                      onClick={async () => {
+                        try {
+                          await updateAppointmentStatus(appointment.id, 'completed');
+                          const updated = await fetchAppointments();
+                          setAppointments(updated);
+                          alert('✨ Marked as completed!');
+                        } catch {
+                          alert('Failed to update appointment');
+                        }
+                      }}
+                      className="px-4 py-2 bg-blue-500 text-white rounded-full font-semibold hover:bg-blue-600 transition-all text-sm"
+                    >
+                      ✨ Complete
+                    </button>
+                    <button
+                      onClick={async () => {
+                        try {
+                          await updateAppointmentStatus(appointment.id, 'cancelled');
+                          const updated = await fetchAppointments();
+                          setAppointments(updated);
+                          alert('❌ Appointment cancelled');
+                        } catch {
+                          alert('Failed to update appointment');
+                        }
+                      }}
+                      className="px-4 py-2 bg-red-500 text-white rounded-full font-semibold hover:bg-red-600 transition-all text-sm"
+                    >
+                      ❌ Cancel
+                    </button>
+                    </>
+                    )}
+                    {appointment.status === 'pending_payment' && (
+                      <p className="text-sm text-orange-600 font-semibold">
+                        ⚠️ Waiting for customer payment...
+                      </p>
+                    )}
                   </div>
                 </div>
               ))}

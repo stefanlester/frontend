@@ -1,47 +1,23 @@
-
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useCart } from '../context/CartContext';
-import { createOrder, createPaymentIntent } from '../api';
+import { createPaymentIntent, createAppointment } from '../api';
 import { useNavigate } from 'react-router-dom';
-
-type CartItem = {
-  id: number;
-  name: string;
-  image: string;
-  price: number;
-  quantity: number;
-};
-
-interface CustomerFormData {
-  email: string;
-  name: string;
-  address: string;
-  city: string;
-  postalCode: string;
-  phone: string;
-}
+import { AuthContext } from '../App';
 
 const Checkout: React.FC = () => {
   const { items, total, clearCart } = useCart();
+  const auth = useContext(AuthContext);
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<CustomerFormData>({
-    email: '',
-    name: '',
-    address: '',
-    city: '',
-    postalCode: '',
-    phone: '',
-  });
   const [processing, setProcessing] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<boolean>(false);
-  const token = localStorage.getItem('token');
+  const token = auth?.token || localStorage.getItem('token');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  // Calculate 20% deposit for all items
+  const depositAmount = total * 0.20;
+  const remainingBalance = total * 0.80;
 
-  const handleStripeCheckout = async () => {
+  const handleCheckout = async () => {
     setProcessing(true);
     setError('');
     try {
@@ -50,22 +26,52 @@ const Checkout: React.FC = () => {
         setProcessing(false);
         return;
       }
-      // Create payment intent
-      const { clientSecret } = await createPaymentIntent(token, total * 1.15);
-      // Use Stripe.js to confirm payment (pseudo, you need to add Stripe.js integration)
-      // For demo, simulate payment success:
-      const paymentIntentId = 'demo_intent_id';
-      // Create order in backend
-      await createOrder({
-        items,
-        total: total * 1.15,
-        customer: formData
+
+      // Create appointments for each cart item
+      const appointmentPromises = items.map(async (item) => {
+        const appointmentData = {
+          service: item.name,
+          date: item.date!,
+          time: item.time!,
+          customerName: item.customerName!,
+          customerEmail: item.customerEmail!,
+          customerPhone: item.customerPhone!,
+          notes: item.notes || '',
+          price: item.price,
+        };
+        
+        return await createAppointment(token, appointmentData);
       });
-      setSuccess(true);
+
+      const createdAppointments = await Promise.all(appointmentPromises);
+
+      // Process payment for 20% deposit
+      const { clientSecret } = await createPaymentIntent(token, depositAmount);
+      const paymentIntentId = 'demo_appointment_' + Date.now();
+
+      // Confirm payment for all appointments
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      await Promise.all(
+        createdAppointments.map(appointment =>
+          fetch(`${apiUrl}/api/appointments/${appointment.id}/confirm-payment`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              paymentIntentId,
+              depositAmount: appointment.price * 0.20,
+            }),
+          })
+        )
+      );
+
       clearCart();
+      setSuccess(true);
       setTimeout(() => navigate('/'), 2000);
     } catch (err: any) {
-      setError(err?.message || 'Order failed.');
+      setError(err.message || 'Payment failed');
     } finally {
       setProcessing(false);
     }
@@ -78,7 +84,7 @@ const Checkout: React.FC = () => {
           <h2 className="text-2xl font-bold text-gray-800 mb-4">You must be logged in to checkout.</h2>
           <button
             onClick={() => navigate('/auth')}
-            className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:from-pink-600 hover:to-purple-700 transition-all"
+            className="btn-gold px-8 py-3"
           >
             Login / Sign Up
           </button>
@@ -91,14 +97,30 @@ const Checkout: React.FC = () => {
     return (
       <div className="py-12 px-4 min-h-[70vh] bg-white flex items-center justify-center">
         <div className="text-center">
-          <div className="text-6xl mb-4">🛒</div>
+          <div className="text-6xl mb-4">📅</div>
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Your cart is empty</h2>
           <button
             onClick={() => navigate('/products')}
-            className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:from-pink-600 hover:to-purple-700 transition-all"
+            className="btn-gold px-8 py-3"
           >
-            Continue Shopping
+            Browse Services
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (success) {
+    return (
+      <div className="py-12 px-4 min-h-[70vh] flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50">
+        <div className="text-center animate-scaleIn">
+          <div className="text-8xl mb-6 animate-bounce">✅</div>
+          <h2 className="text-4xl font-extrabold gradient-text mb-4">Appointments Booked Successfully!</h2>
+          <p className="text-gray-600 text-xl mb-2">Thank you for your deposit payment</p>
+          <p className="text-gray-500 mb-8">You will receive a confirmation email shortly</p>
+          <div className="inline-block animate-pulse">
+            <p className="text-sm text-gray-500">Redirecting to home page...</p>
+          </div>
         </div>
       </div>
     );
@@ -110,173 +132,151 @@ const Checkout: React.FC = () => {
       <div className="absolute bottom-10 right-1/4 w-72 h-72 bg-blue-200 opacity-20 blur-3xl rounded-tl-[5rem] rounded-br-[5rem]"></div>
       
       <div className="max-w-6xl mx-auto relative z-10">
-        <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-blue-600 mb-8 text-center drop-shadow">
-          Secure Checkout
+        <h2 className="text-4xl font-extrabold gradient-text mb-8 text-center drop-shadow">
+          Appointment Booking Checkout
         </h2>
+        <div className="bg-purple-100 border-2 border-purple-300 rounded-2xl p-6 mb-8 text-center">
+          <p className="text-lg font-semibold text-purple-800">
+            💰 20% Deposit Required: ${depositAmount.toFixed(2)}
+          </p>
+          <p className="text-sm text-purple-600 mt-2">
+            Remaining balance of ${remainingBalance.toFixed(2)} will be collected at your appointment
+          </p>
+        </div>
         <div className="flex items-center justify-center gap-3 mb-10">
           <span className="text-3xl">🔒</span>
           <span className="text-gray-600 font-medium">Your payment is 100% secure</span>
           <span className="text-3xl">✅</span>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Checkout Form */}
-          <div className="lg:col-span-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Appointment Summary */}
+          <div>
             <div className="bg-white rounded-3xl shadow-2xl p-8 border-2 border-green-100">
               <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                📋 Shipping Information
+                📅 Your Appointments
               </h3>
-              <form className="space-y-4">
-                <div>
-                  <label className="block text-gray-700 font-semibold mb-2">Email Address</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none transition-colors"
-                    placeholder="your@email.com"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-700 font-semibold mb-2">Full Name</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none transition-colors"
-                    placeholder="John Doe"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-700 font-semibold mb-2">Address</label>
-                  <input
-                    type="text"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none transition-colors"
-                    placeholder="123 Main Street"
-                    required
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-gray-700 font-semibold mb-2">City</label>
-                    <input
-                      type="text"
-                      name="city"
-                      value={formData.city}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none transition-colors"
-                      placeholder="Johannesburg"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-gray-700 font-semibold mb-2">Postal Code</label>
-                    <input
-                      type="text"
-                      name="postalCode"
-                      value={formData.postalCode}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none transition-colors"
-                      placeholder="2000"
-                      required
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-gray-700 font-semibold mb-2">Phone Number</label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none transition-colors"
-                    placeholder="+27 12 345 6789"
-                    required
-                  />
-                </div>
-              </form>
-
-              <div className="mt-8 pt-8 border-t-2 border-gray-200">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                  💳 Payment Method
-                </h3>
-                <div className="space-y-4">
-                  <div className="bg-gradient-to-r from-purple-500 to-blue-700 rounded-2xl p-6 text-white shadow-lg">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-2xl font-bold mb-1">Credit/Debit Card (Stripe)</div>
-                        <div className="text-blue-100 text-sm">Fast, secure, and trusted worldwide</div>
-                      </div>
-                      <div className="text-5xl">💳</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Order Summary */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-3xl shadow-2xl p-8 border-2 border-green-100 sticky top-24">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Order Summary</h3>
-              
-              <div className="space-y-4 mb-6 max-h-64 overflow-y-auto">
+              <div className="space-y-6">
                 {items.map((item) => (
-                  <div key={item.id} className="flex gap-3 pb-4 border-b border-gray-200">
-                    <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-lg" />
-                    <div className="flex-1">
-                      <p className="font-semibold text-sm text-gray-900">{item.name}</p>
-                      <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
-                      <p className="text-sm font-bold text-pink-600">${(item.price * item.quantity).toFixed(2)}</p>
+                  <div key={item.id} className="border-2 border-brown-200 rounded-2xl p-6 bg-brown-50">
+                    <div className="flex gap-4">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-24 h-24 object-cover rounded-xl shadow-md"
+                      />
+                      <div className="flex-1">
+                        <h4 className="text-xl font-bold text-brand-primary mb-2">{item.name}</h4>
+                        <div className="space-y-1 text-sm text-gray-700">
+                          <p className="flex items-center gap-2">
+                            <span className="font-semibold">📅 Date:</span> {item.date}
+                          </p>
+                          <p className="flex items-center gap-2">
+                            <span className="font-semibold">🕐 Time:</span> {item.time}
+                          </p>
+                          <p className="flex items-center gap-2">
+                            <span className="font-semibold">👤 Name:</span> {item.customerName}
+                          </p>
+                          <p className="flex items-center gap-2">
+                            <span className="font-semibold">📧 Email:</span> {item.customerEmail}
+                          </p>
+                          <p className="flex items-center gap-2">
+                            <span className="font-semibold">📱 Phone:</span> {item.customerPhone}
+                          </p>
+                          {item.notes && (
+                            <p className="flex items-start gap-2 mt-2 p-2 bg-white rounded-lg">
+                              <span className="font-semibold">💬 Notes:</span>
+                              <span className="flex-1">{item.notes}</span>
+                            </p>
+                          )}
+                        </div>
+                        <div className="mt-4 pt-4 border-t-2 border-brown-300">
+                          <p className="text-2xl font-bold gradient-text-gold">${item.price.toFixed(2)}</p>
+                          <p className="text-sm text-gray-600">Deposit (20%): ${(item.price * 0.20).toFixed(2)}</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
 
-              <div className="space-y-3 mb-6">
+          {/* Payment Summary */}
+          <div>
+            <div className="bg-white rounded-3xl shadow-2xl p-8 border-2 border-blue-100 sticky top-28">
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">Payment Summary</h3>
+              <div className="space-y-4 mb-8">
                 <div className="flex justify-between text-gray-700">
-                  <span>Subtotal</span>
-                  <span className="font-semibold">${total.toFixed(2)}</span>
+                  <span>Total Service Cost:</span>
+                  <span className="font-bold">${total.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-gray-700">
-                  <span>Shipping</span>
-                  <span className="font-semibold text-green-600">FREE</span>
+                  <span>Deposit (20%):</span>
+                  <span className="font-bold text-purple-600">${depositAmount.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-gray-700">
-                  <span>Tax (15%)</span>
-                  <span className="font-semibold">${(total * 0.15).toFixed(2)}</span>
+                  <span>Pay at Appointment:</span>
+                  <span className="font-bold text-green-600">${remainingBalance.toFixed(2)}</span>
                 </div>
-                <div className="border-t-2 border-gray-200 pt-4">
-                  <div className="flex justify-between text-2xl font-bold text-gray-900">
-                    <span>Total</span>
-                    <span className="text-green-600">${(total * 1.15).toFixed(2)}</span>
+                <div className="border-t-2 border-gray-300 pt-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-2xl font-bold text-gray-900">Due Today:</span>
+                    <span className="text-3xl font-extrabold gradient-text-gold">${depositAmount.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
 
-              {error && <div className="text-red-500 text-center mb-2">{error}</div>}
-              {success && <div className="text-green-600 text-center mb-2 font-bold">✅ Payment successful! Thank you for your order.</div>}
+              {error && (
+                <div className="mb-6 p-4 bg-red-100 border-2 border-red-300 rounded-xl">
+                  <p className="text-red-700 font-semibold">⚠️ {error}</p>
+                </div>
+              )}
+
               <button
-                onClick={handleStripeCheckout}
+                onClick={handleCheckout}
                 disabled={processing}
-                className={`w-full py-4 rounded-full font-bold text-lg shadow-lg transition-all transform ${
-                  processing
-                    ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 hover:scale-105 text-white'
-                }`}
+                className="btn-gold w-full text-lg py-4 mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {processing ? '⏳ Processing...' : '💳 Pay with Card'}
+                {processing ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="animate-spin">⏳</span> Processing...
+                  </span>
+                ) : (
+                  <span className="flex items-center justify-center gap-2">
+                    💳 Pay Deposit ${depositAmount.toFixed(2)}
+                  </span>
+                )}
               </button>
-              <p className="text-xs text-gray-500 text-center mt-4">
-                By completing this purchase you agree to our Terms & Conditions
-              </p>
+
+              <button
+                onClick={() => navigate('/cart')}
+                className="btn-secondary w-full py-3.5"
+              >
+                ← Back to Cart
+              </button>
+
+              {/* Trust Badges */}
+              <div className="mt-8 pt-8 border-t border-gray-200">
+                <div className="space-y-3 text-sm text-gray-600">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">🔒</span>
+                    <span>Secure Payment Processing</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">✨</span>
+                    <span>Professional Service Guarantee</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">📧</span>
+                    <span>Instant Email Confirmation</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">📞</span>
+                    <span>24/7 Customer Support</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
