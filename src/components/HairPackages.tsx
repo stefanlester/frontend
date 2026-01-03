@@ -12,6 +12,8 @@ const HairPackages: React.FC = () => {
       tagline: 'Authentic African Beauty',
       description: 'Authentic Fulani tribal braids with intricate patterns and beading.',
       price: 142,
+      priceMin: 85,
+      priceMax: 200,
       duration: 240,
       image: '/LEMONADES, FULANI BRAIDS/WhatsApp Image 2025-12-21 at 15.20.30 (2).jpeg',
       category: 'Lemonades & Fulani Braids',
@@ -34,8 +36,10 @@ const HairPackages: React.FC = () => {
       tagline: 'Glamorous Statement',
       description: 'Glamorous diva knotless braids that command attention.',
       price: 170,
+      priceMin: 90,
+      priceMax: 250,
       duration: 240,
-      image: '/WhatsApp Image 2025-12-27 at 19.22.12 (2).jpeg',
+      image: '/New folder (3)/Diva braids/Diva braids.jpeg',
       category: 'Goddess Braided Knotless',
       badge: '💫 Signature'
     },
@@ -100,11 +104,13 @@ const HairPackages: React.FC = () => {
                 {/* Stats Grid */}
                 <div className="grid grid-cols-2 gap-4 py-6">
                   <div className="text-center p-4 bg-white rounded-xl shadow-sm border border-brown-100">
-                    <div className="text-3xl font-extrabold gradient-text-gold">${pkg.price}</div>
+                    <div className="text-3xl font-extrabold gradient-text-gold">
+                      {pkg.priceMin && pkg.priceMax ? `£${pkg.priceMin}-£${pkg.priceMax}` : `£${pkg.price}`}
+                    </div>
                     <div className="text-sm text-gray-500 mt-1">Investment</div>
                   </div>
                   <div className="text-center p-4 bg-white rounded-xl shadow-sm border border-brown-100">
-                    <div className="text-3xl font-extrabold text-brand-primary">{pkg.duration} min</div>
+                    <div className="text-3xl font-extrabold text-brand-primary">{Math.floor(pkg.duration / 60)}h{pkg.duration % 60 > 0 ? ` ${pkg.duration % 60}m` : ''}</div>
                     <div className="text-sm text-gray-500 mt-1">Duration</div>
                   </div>
                 </div>

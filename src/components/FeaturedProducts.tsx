@@ -1,15 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { realProducts } from '../realProducts';
+import { realProducts, Product } from '../realProducts';
 import { useNavigate } from 'react-router-dom';
-
-type Product = {
-  id: number;
-  name: string;
-  price: number;
-  duration: number; // in minutes
-  image: string;
-  description: string;
-};
 
 const FeaturedProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -86,9 +77,11 @@ const FeaturedProducts = () => {
                 <p className="text-sm text-white/90 mb-4 line-clamp-2">{product.description}</p>
                 <div className="w-full flex flex-wrap items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <span className="text-3xl font-extrabold gradient-text-gold bg-white bg-clip-text px-2 py-1 rounded">${product.price}</span>
+                    <span className="text-3xl font-extrabold gradient-text-gold bg-white bg-clip-text px-2 py-1 rounded">
+                      {product.priceMin && product.priceMax ? `£${product.priceMin}-£${product.priceMax}` : `£${product.price}`}
+                    </span>
                     <span className="px-3 py-1 bg-brown-100 text-brand-primary rounded-full text-sm font-semibold flex items-center gap-1">
-                      <span>⏱️</span> {product.duration} min
+                      <span>⏱️</span> {Math.floor(product.duration / 60)}h{product.duration % 60 > 0 ? ` ${product.duration % 60}m` : ''}
                     </span>
                   </div>
                   <div className="flex gap-2">
@@ -129,9 +122,11 @@ const FeaturedProducts = () => {
                     <h4 className="text-3xl font-bold mb-3 gradient-text font-heading">{selectedProduct.name}</h4>
                     <p className="text-gray-600 mb-5 text-lg leading-relaxed">{selectedProduct.description}</p>
                     <div className="flex items-center gap-4 mb-6">
-                      <p className="text-4xl font-extrabold gradient-text-gold">${selectedProduct.price}</p>
+                      <p className="text-4xl font-extrabold gradient-text-gold">
+                        {selectedProduct.priceMin && selectedProduct.priceMax ? `£${selectedProduct.priceMin}-£${selectedProduct.priceMax}` : `£${selectedProduct.price}`}
+                      </p>
                       <span className="px-4 py-2 bg-brown-100 text-brand-primary rounded-full text-base font-semibold flex items-center gap-2">
-                        <span>⏱️</span> {selectedProduct.duration} min
+                        <span>⏱️</span> {Math.floor(selectedProduct.duration / 60)}h{selectedProduct.duration % 60 > 0 ? ` ${selectedProduct.duration % 60}m` : ''}
                       </span>
                     </div>
                     {/* Features */}

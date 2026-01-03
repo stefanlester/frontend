@@ -13,9 +13,9 @@ const Checkout: React.FC = () => {
   const [success, setSuccess] = useState<boolean>(false);
   const token = auth?.token || localStorage.getItem('token');
 
-  // Calculate 20% deposit for all items
-  const depositAmount = total * 0.20;
-  const remainingBalance = total * 0.80;
+  // Flat £20 deposit per appointment
+  const depositAmount = items.length * 20;
+  const remainingBalance = total - depositAmount;
 
   const handleCheckout = async () => {
     setProcessing(true);
@@ -61,7 +61,7 @@ const Checkout: React.FC = () => {
             },
             body: JSON.stringify({
               paymentIntentId,
-              depositAmount: appointment.price * 0.20,
+              depositAmount: 20, // Flat £20 deposit
             }),
           })
         )
@@ -137,10 +137,10 @@ const Checkout: React.FC = () => {
         </h2>
         <div className="bg-purple-100 border-2 border-purple-300 rounded-2xl p-6 mb-8 text-center">
           <p className="text-lg font-semibold text-purple-800">
-            💰 20% Deposit Required: ${depositAmount.toFixed(2)}
+            💰 Deposit Required: £{depositAmount.toFixed(2)}
           </p>
           <p className="text-sm text-purple-600 mt-2">
-            Remaining balance of ${remainingBalance.toFixed(2)} will be collected at your appointment
+            £20 deposit per appointment. Remaining balance of £{remainingBalance.toFixed(2)} will be collected at your appointment
           </p>
         </div>
         <div className="flex items-center justify-center gap-3 mb-10">
@@ -191,8 +191,8 @@ const Checkout: React.FC = () => {
                           )}
                         </div>
                         <div className="mt-4 pt-4 border-t-2 border-brown-300">
-                          <p className="text-2xl font-bold gradient-text-gold">${item.price.toFixed(2)}</p>
-                          <p className="text-sm text-gray-600">Deposit (20%): ${(item.price * 0.20).toFixed(2)}</p>
+                          <p className="text-2xl font-bold gradient-text-gold">£{item.price.toFixed(2)}</p>
+                          <p className="text-sm text-gray-600">Deposit: £20.00</p>
                         </div>
                       </div>
                     </div>
@@ -209,20 +209,20 @@ const Checkout: React.FC = () => {
               <div className="space-y-4 mb-8">
                 <div className="flex justify-between text-gray-700">
                   <span>Total Service Cost:</span>
-                  <span className="font-bold">${total.toFixed(2)}</span>
+                  <span className="font-bold">£{total.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-gray-700">
-                  <span>Deposit (20%):</span>
-                  <span className="font-bold text-purple-600">${depositAmount.toFixed(2)}</span>
+                  <span>Deposit ({items.length} appointment{items.length > 1 ? 's' : ''}):</span>
+                  <span className="font-bold text-purple-600">£{depositAmount.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-gray-700">
                   <span>Pay at Appointment:</span>
-                  <span className="font-bold text-green-600">${remainingBalance.toFixed(2)}</span>
+                  <span className="font-bold text-green-600">£{remainingBalance.toFixed(2)}</span>
                 </div>
                 <div className="border-t-2 border-gray-300 pt-4">
                   <div className="flex justify-between items-center">
                     <span className="text-2xl font-bold text-gray-900">Due Today:</span>
-                    <span className="text-3xl font-extrabold gradient-text-gold">${depositAmount.toFixed(2)}</span>
+                    <span className="text-3xl font-extrabold gradient-text-gold">£{depositAmount.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
@@ -244,7 +244,7 @@ const Checkout: React.FC = () => {
                   </span>
                 ) : (
                   <span className="flex items-center justify-center gap-2">
-                    💳 Pay Deposit ${depositAmount.toFixed(2)}
+                    💳 Pay Deposit £{depositAmount.toFixed(2)}
                   </span>
                 )}
               </button>

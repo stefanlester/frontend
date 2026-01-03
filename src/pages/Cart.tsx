@@ -69,10 +69,10 @@ const Cart = () => {
                     <div>
                       <h3 className="text-2xl font-bold text-brand-primary mb-2 font-heading">{item.name}</h3>
                       <div className="flex items-center gap-3 mb-4">
-                        <p className="gradient-text-gold font-bold text-xl">${item.price}</p>
+                        <p className="gradient-text-gold font-bold text-xl">£{item.price}</p>
                         {item.duration && (
                           <span className="text-brown-600 text-sm font-medium px-3 py-1 bg-brown-100 rounded-full">
-                            ⏱️ {item.duration} min
+                            ⏱️ {Math.floor(item.duration / 60)}h {item.duration % 60 > 0 ? `${item.duration % 60}m` : ''}
                           </span>
                         )}
                       </div>
@@ -95,7 +95,7 @@ const Cart = () => {
                   <div className="text-right flex flex-col justify-between">
                     <div>
                       <p className="text-sm text-gray-500 mb-1 uppercase tracking-wide">Price</p>
-                      <p className="text-3xl font-bold gradient-text-gold">${item.price.toFixed(2)}</p>
+                      <p className="text-3xl font-bold gradient-text-gold">£{item.price.toFixed(2)}</p>
                     </div>
                   </div>
                 </div>
@@ -210,7 +210,7 @@ const Cart = () => {
               <div className="space-y-5 mb-8">
                 <div className="flex justify-between text-gray-700 text-lg">
                   <span className="font-medium">Subtotal</span>
-                  <span className="font-bold text-brand-primary">${total.toFixed(2)}</span>
+                  <span className="font-bold text-brand-primary">£{total.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-gray-700 text-lg">
                   <span className="font-medium">Shipping</span>
@@ -220,12 +220,12 @@ const Cart = () => {
                 </div>
                 <div className="flex justify-between text-gray-700 text-lg">
                   <span className="font-medium">Tax</span>
-                  <span className="font-bold text-brand-primary">${(total * 0.15).toFixed(2)}</span>
+                  <span className="font-bold text-brand-primary">£{(total * 0.15).toFixed(2)}</span>
                 </div>
                 <div className="border-t-2 border-brown-200 pt-5">
                   <div className="flex justify-between items-center">
                     <span className="text-2xl font-bold text-brand-primary font-heading">Total</span>
-                    <span className="text-3xl font-extrabold gradient-text-gold">${(total * 1.15).toFixed(2)}</span>
+                    <span className="text-3xl font-extrabold gradient-text-gold">£{(total * 1.15).toFixed(2)}</span>
                   </div>
                 </div>
               </div>

@@ -1,15 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { realProducts } from '../realProducts';
+import { realProducts, Product } from '../realProducts';
 import { useNavigate } from 'react-router-dom';
-
-type Product = {
-  id: number;
-  name: string;
-  price: number;
-  duration: number; // in minutes
-  image: string;
-  description: string;
-};
 
 const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -184,8 +175,10 @@ function ProductCard({ product, idx, onAdd }: { product: any; idx: number; onAdd
       </div>
       <h3 className="text-xl font-bold text-brand-primary mb-2 text-center relative z-10 font-heading group-hover:text-brand-accent transition-colors">{product.name}</h3>
       <div className="flex items-center gap-3 mb-2 relative z-10">
-        <p className="gradient-text-gold font-extrabold text-2xl">${product.price}</p>
-        <span className="text-brown-600 text-sm font-medium px-3 py-1 bg-brown-100 rounded-full">⏱️ {product.duration} min</span>
+        <p className="gradient-text-gold font-extrabold text-2xl">
+          {product.priceMin && product.priceMax ? `£${product.priceMin}-£${product.priceMax}` : `£${product.price}`}
+        </p>
+        <span className="text-brown-600 text-sm font-medium px-3 py-1 bg-brown-100 rounded-full">⏱️ {Math.floor(product.duration / 60)}h{product.duration % 60 > 0 ? ` ${product.duration % 60}m` : ''}</span>
       </div>
       <p className="text-gray-600 text-sm mb-6 text-center relative z-10 line-clamp-2">{product.description}</p>
       <button

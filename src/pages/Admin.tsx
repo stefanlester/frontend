@@ -265,7 +265,7 @@ const Admin = () => {
                   <div className="flex-1">
                     <h4 className="font-bold text-lg text-gray-900">{product.name}</h4>
                     <p className="text-gray-600 text-sm">{product.description}</p>
-                    <p className="text-purple-600 font-bold mt-1">${product.price}</p>
+                    <p className="text-purple-600 font-bold mt-1">£{product.price}</p>
                   </div>
                   <div className="flex gap-2">
                     <button
@@ -307,7 +307,7 @@ const Admin = () => {
                     <p className="text-sm text-gray-500">Placed: {order.date || 'N/A'}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-bold text-purple-600">${order.total}</p>
+                    <p className="text-2xl font-bold text-purple-600">£{order.total}</p>
                     <span className="inline-block bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold mt-2">
                       ✅ Completed
                     </span>
@@ -409,7 +409,7 @@ const Admin = () => {
                       {appointment.depositPaid && (
                         <div className="mt-3 p-3 bg-green-50 rounded-lg">
                           <p className="font-semibold text-green-700 text-sm">
-                            ✅ Deposit Paid: ${appointment.depositAmount?.toFixed(2) || '0.00'}
+                            ✅ Deposit Paid: £{appointment.depositAmount?.toFixed(2) || '0.00'}
                           </p>
                         </div>
                       )}

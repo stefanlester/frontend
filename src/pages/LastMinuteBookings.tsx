@@ -218,7 +218,7 @@ const LastMinuteBookings: React.FC = () => {
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-full font-bold text-sm shadow-lg">
-                      Save ${service.savings}
+                      Save £{service.savings}
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                     <div className="absolute bottom-4 left-4 text-white">
@@ -230,10 +230,10 @@ const LastMinuteBookings: React.FC = () => {
                     <div className="flex items-center justify-between mb-4 p-3 bg-orange-50 rounded-xl">
                       <div>
                         <p className="text-xs text-gray-500 line-through">
-                          ${service.regularPrice}
+                          £{service.regularPrice}
                         </p>
                         <p className="text-3xl font-bold text-orange-600">
-                          ${service.quickPrice}
+                          £{service.quickPrice}
                         </p>
                       </div>
                       <div className="text-right">
@@ -241,7 +241,7 @@ const LastMinuteBookings: React.FC = () => {
                           15% OFF
                         </div>
                         <p className="text-xs text-gray-500 mt-1">
-                          ⏱️ {service.duration} min
+                          ⏱️ {Math.floor(service.duration / 60)}h {service.duration % 60 > 0 ? `${service.duration % 60}m` : ''}
                         </p>
                       </div>
                     </div>

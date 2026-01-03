@@ -5,19 +5,35 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import BookingCalendar from '../components/BookingCalendar';
 import TimeSlotGrid from '../components/TimeSlotGrid';
 import ServiceBundles from '../components/ServiceBundles';
+import { realProducts, Product } from '../realProducts';
 
-const services = [
-  { name: 'Braids & Cornrows', duration: '2-4 hours', price: 150, depositPercent: 20 },
-  { name: 'Weave Installation', duration: '2-3 hours', price: 200, depositPercent: 20 },
-  { name: 'Wig Installation', duration: '1-2 hours', price: 120, depositPercent: 20 },
-  { name: 'Dreadlocs/Sister Locs', duration: '3-5 hours', price: 250, depositPercent: 20 },
-  { name: 'Natural Hair Styling', duration: '1-2 hours', price: 80, depositPercent: 20 },
-  { name: 'Hair Coloring', duration: '2-3 hours', price: 180, depositPercent: 20 },
-  { name: 'Silk Press', duration: '2 hours', price: 100, depositPercent: 20 },
-  { name: 'Hair Treatment', duration: '1 hour', price: 60, depositPercent: 20 },
-];
+// Group services by category
+const groupedServices = realProducts.reduce((acc, product) => {
+  if (!acc[product.category]) {
+    acc[product.category] = [];
+  }
+  acc[product.category].push({
+    name: product.name,
+    price: product.price,
+    priceMin: product.priceMin,
+    priceMax: product.priceMax,
+    duration: product.duration,
+    depositAmount: 20 // Flat £20 deposit
+  });
+  return acc;
+}, {} as Record<string, Array<{ name: string; price: number; priceMin?: number; priceMax?: number; duration: number; depositAmount: number }>>);
 
-const Booking = () => {
+// Flatten all services for easy lookup
+const allServices = realProducts.map(product => ({
+  name: product.name,
+  price: product.price,
+  priceMin: product.priceMin,
+  priceMax: product.priceMax,
+  duration: product.duration,
+  depositAmount: 20 // Flat £20 deposit
+}));
+
+const Booking = () => { 
   const authContext = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
@@ -61,9 +77,9 @@ const Booking = () => {
       // Create appointment with pending_payment status
       const appointment = await createAppointment(authContext.token, formData);
       
-      // Calculate deposit (20% of service price)
-      const selectedService = services.find(s => s.name === formData.service);
-      const depositAmount = selectedService ? (selectedService.price * selectedService.depositPercent) / 100 : 0;
+      // Flat £20 deposit upfront
+      const selectedService = allServices.find(s => s.name === formData.service);
+      const depositAmount = 20; // Flat £20 deposit
       
       // Store appointment details in sessionStorage for checkout
       sessionStorage.setItem('pendingAppointment', JSON.stringify({
@@ -93,8 +109,8 @@ const Booking = () => {
   const today = new Date().toISOString().split('T')[0];
   
   // Get selected service duration
-  const selectedService = services.find(s => s.name === formData.service);
-  const serviceDuration = selectedService ? parseInt(selectedService.duration.split('-')[0]) * 60 : 120; // Default 120 min
+  const selectedService = allServices.find(s => s.name === formData.service);
+  const serviceDuration = selectedService ? selectedService.duration : 120; // Default 120 min
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-white py-12 px-4">
@@ -156,34 +172,83 @@ const Booking = () => {
             </div>
           )}
           <form onSubmit={handleSubmit} className="space-y-8">
-            {/* Service Selection */}
+            {/* Service Selection by Category */}
             <div>
-              <label className="block text-2xl font-bold text-gray-900 mb-4">
+              <label className="block text-2xl font-bold text-gray-900 mb-6">
                 1️⃣ Select Service *
               </label>
-              <select
-                name="service"
-                value={formData.service}
-                onChange={handleChange}
-                required
-                className="w-full px-6 py-4 rounded-xl border-2 border-purple-200 focus:border-purple-400 focus:outline-none text-gray-700 bg-white text-lg font-semibold shadow-sm"
-              >
-                <option value="">Choose a service...</option>
-                {services.map((service) => (
-                  <option key={service.name} value={service.name}>
-                    {service.name} - ${service.price} ({service.duration})
-                  </option>
+              
+              <div className="space-y-4">
+                {Object.entries(groupedServices).map(([category, services]) => (
+                  <div key={category} className="border-2 border-purple-100 rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
+                    {/* Category Header */}
+                    <div className="bg-gradient-to-r from-purple-50 to-pink-50 px-6 py-4 border-b-2 border-purple-100">
+                      <h3 className="text-lg font-bold text-purple-900">{category}</h3>
+                    </div>
+                    
+                    {/* Services Grid */}
+                    <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {services.map((service) => {
+                        const product = realProducts.find(p => p.name === service.name);
+                        const priceDisplay = product?.priceMin && product?.priceMax 
+                          ? `£${product.priceMin}-£${product.priceMax}` 
+                          : `£${service.price}`;
+                        const timeDisplay = `${Math.floor(service.duration / 60)}h${service.duration % 60 > 0 ? ` ${service.duration % 60}m` : ''}`;
+                        const isSelected = formData.service === service.name;
+                        
+                        return (
+                          <button
+                            key={service.name}
+                            type="button"
+                            onClick={() => {
+                              setFormData({ ...formData, service: service.name });
+                              handleChange({ target: { name: 'service', value: service.name } } as any);
+                            }}
+                            className={`text-left p-4 rounded-lg border-2 transition-all ${
+                              isSelected
+                                ? 'border-purple-500 bg-purple-50 shadow-md scale-[1.02]'
+                                : 'border-gray-200 hover:border-purple-300 hover:bg-purple-25'
+                            }`}
+                          >
+                            <div className="flex justify-between items-start mb-2">
+                              <h4 className={`font-semibold text-sm ${isSelected ? 'text-purple-900' : 'text-gray-900'}`}>
+                                {service.name}
+                              </h4>
+                              {isSelected && <span className="text-purple-600 text-lg">✓</span>}
+                            </div>
+                            <div className="flex items-center gap-3 text-xs text-gray-600">
+                              <span className="font-bold text-purple-600">{priceDisplay}</span>
+                              <span>•</span>
+                              <span>⏱️ {timeDisplay}</span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 ))}
-              </select>
-              {selectedService && (
-                <div className="mt-4 p-4 bg-purple-50 rounded-xl border border-purple-200">
-                  <p className="text-sm text-gray-700">
-                    <span className="font-semibold">💰 Price:</span> ${selectedService.price} 
-                    <span className="ml-4"><span className="font-semibold">⏱️ Duration:</span> {selectedService.duration}</span>
-                    <span className="ml-4"><span className="font-semibold">💳 Deposit:</span> ${(selectedService.price * 0.20).toFixed(2)} (20%)</span>
+              </div>
+
+              {selectedService && (()=> {
+                const product = realProducts.find(p => p.name === selectedService.name);
+                const priceDisplay = product?.priceMin && product?.priceMax 
+                  ? `£${product.priceMin}-£${product.priceMax}` 
+                  : `£${selectedService.price}`;
+                return (
+                <div className="mt-6 p-5 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border-2 border-green-300 shadow-sm">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-2xl">✨</span>
+                    <h4 className="font-bold text-green-900 text-lg">Selected Service</h4>
+                  </div>
+                  <p className="text-sm text-gray-700 space-x-4">
+                    <span><span className="font-semibold">Service:</span> {selectedService.name}</span>
+                    <span><span className="font-semibold">💰 Price:</span> {priceDisplay}</span>
+                    <span><span className="font-semibold">⏱️ Duration:</span> {Math.floor(selectedService.duration / 60)}h {selectedService.duration % 60 > 0 ? `${selectedService.duration % 60}m` : ''}</span>
+                    <span><span className="font-semibold">💳 Deposit:</span> £20</span>
                   </p>
                 </div>
-              )}
+                );
+              })()}
             </div>
 
             {/* Calendar and Time Slot Selection */}
@@ -299,10 +364,10 @@ const Booking = () => {
                   disabled={loading}
                   className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-6 rounded-xl font-bold text-xl shadow-xl hover:from-purple-700 hover:to-pink-700 transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {loading ? '⏳ Processing...' : '💳 Proceed to Payment (20% Deposit)'}
+                  {loading ? '⏳ Processing...' : '💳 Proceed to Payment (£20 Deposit)'}
                 </button>
                 <p className="text-center text-sm text-gray-500 mt-2">
-                  A 20% deposit of ${selectedService ? (selectedService.price * 0.20).toFixed(2) : '0.00'} is required to secure your appointment
+                  A £20 deposit is required to secure your appointment
                 </p>
               </>
             )}
@@ -313,7 +378,7 @@ const Booking = () => {
             <ul className="text-sm text-gray-600 space-y-1">
               <li>• Please arrive 10 minutes before your scheduled time</li>
               <li>• Cancellations must be made 24 hours in advance</li>
-              <li>• A 20% deposit is required to secure your appointment</li>
+              <li>• A £20 deposit is required to secure your appointment</li>
               <li>• We will contact you to confirm your appointment</li>
             </ul>
           </div>

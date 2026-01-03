@@ -145,15 +145,15 @@ const ServiceBundles: React.FC<ServiceBundlesProps> = ({ onSelectBundle }) => {
               <div className="flex items-center justify-between mb-4 p-3 bg-purple-50 rounded-xl">
                 <div>
                   <p className="text-xs text-gray-500 line-through">
-                    ${bundle.regularPrice}
+                    £{bundle.regularPrice}
                   </p>
                   <p className="text-2xl font-bold text-purple-600">
-                    ${bundle.bundlePrice}
+                    £{bundle.bundlePrice}
                   </p>
                 </div>
                 <div className="text-right">
                   <div className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
-                    Save ${bundle.savings}
+                    Save £{bundle.savings}
                   </div>
                   <p className="text-xs text-gray-500 mt-1">
                     {Math.round((bundle.savings / bundle.regularPrice) * 100)}% off
