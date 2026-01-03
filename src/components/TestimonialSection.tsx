@@ -8,7 +8,7 @@ const testimonials = [
   },
   {
     name: 'Thabo K.',
-    text: 'Fast delivery and the shampoo leaves my hair so soft. Highly recommend HairCity!',
+    text: 'Fast delivery and the shampoo leaves my hair so soft. Highly recommend Chi\'s Luxe Beauties!',
     image: 'https://randomuser.me/api/portraits/men/32.jpg',
   },
   {

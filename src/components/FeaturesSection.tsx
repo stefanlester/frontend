@@ -39,7 +39,7 @@ const FeaturesSection = () => (
     <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-yellow-200 rounded-full opacity-20 blur-2xl"></div>
     
     <h3 className="text-4xl font-extrabold text-center text-pink-700 mb-12 drop-shadow relative z-10">
-      Why Choose HairCity?
+      Why Choose Chi's Luxe Beauties?
     </h3>
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto relative z-10">
       {features.map((feature, idx) => (
