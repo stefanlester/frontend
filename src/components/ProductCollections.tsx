@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const collections = [
   {
@@ -25,7 +25,15 @@ const collections = [
   },
 ];
 
-const ProductCollections = () => (
+const ProductCollections = () => {
+  const navigate = useNavigate();
+
+  const handleExplore = (link: string) => {
+    navigate(link);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  return (
   <section className="py-16 px-4 bg-white relative overflow-hidden">
     <div className="absolute top-1/2 left-0 w-72 h-72 bg-gradient-to-br from-pink-100 to-purple-100 rounded-full opacity-30 blur-3xl"></div>
     <div className="absolute top-1/4 right-0 w-96 h-96 bg-gradient-to-br from-yellow-100 to-pink-100 rounded-full opacity-30 blur-3xl"></div>
@@ -54,12 +62,12 @@ const ProductCollections = () => (
               <div className="absolute inset-0 flex flex-col items-center justify-end pb-12 text-white">
                 <h4 className="text-3xl font-extrabold mb-2 drop-shadow-lg">{collection.title}</h4>
                 <p className="text-lg mb-4 drop-shadow">{collection.products}</p>
-                <Link
-                  to={collection.link}
+                <button
+                  onClick={() => handleExplore(collection.link)}
                   className="bg-white text-gray-900 px-8 py-3 rounded-full font-bold shadow-xl hover:bg-gray-100 transition-all transform group-hover:scale-110"
                 >
                   Explore →
-                </Link>
+                </button>
               </div>
             </div>
           </div>
@@ -67,6 +75,7 @@ const ProductCollections = () => (
       </div>
     </div>
   </section>
-);
+  );
+};
 
 export default ProductCollections;
